@@ -29,7 +29,15 @@ const Lesson = sequelize.define("Lesson", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  public_id_thumbnail: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   lessonVideo: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  public_id_video: {
     type: DataTypes.STRING,
     allowNull: true,
   },

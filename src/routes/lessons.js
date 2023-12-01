@@ -20,82 +20,81 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Route for adding a new Lesson with an uploaded image and video
+router.post("/add", upload.single("lessonThumbnail"), async (req, res) => {
+  try {
+    const { lessonNumber, lessonName, lessonDescription, yunitId, teacherId } =
+      req.body;
+
+    // Check if a Lesson with the same lessonNumber and teacherId already exists
+    const existingLesson = await Lesson.findOne({
+      where: { lessonNumber, yunitId, teacherId },
+    });
+
+    if (existingLesson) {
+      return res.status(400).json({
+        error: "Lesson with the same number and teacher already exists",
+      });
+    }
+
+    const lessonTitle = `[${lessonNumber}] ${lessonName}`;
+
+    const newLessonData = {
+      lessonTitle,
+      lessonNumber,
+      lessonName,
+      lessonDescription,
+      yunitId,
+      teacherId,
+    };
+
+    // Check if a thumbnail image was uploaded
+    if (req.file) {
+      newLessonData.lessonThumbnail = req.file.filename;
+    }
+
+    const newLesson = await Lesson.create(newLessonData);
+    res.status(201).json(newLesson);
+  } catch (error) {
+    console.error("Error during Lesson addition:", error);
+    res.status(500).json({ error: "Lesson addition failed" });
+  }
+});
+
+// Route for adding a lessonVideo to an existing lesson entry
 router.post(
-  "/add",
-  upload.fields([{ name: "lessonThumbnail" }, { name: "lessonVideo" }]),
+  "/addVideo/:lessonId",
+  upload.single("lessonVideo"),
   async (req, res) => {
     try {
-      const {
-        lessonNumber,
-        lessonName,
-        lessonDescription,
-        yunitId,
-        teacherId,
-      } = req.body;
+      const { lessonId } = req.params;
+      const lesson = await Lesson.findByPk(lessonId);
 
-      // Check if a Lesson with the same lessonNumber and teacherId already exists
-      const existingLesson = await Lesson.findOne({
-        where: { lessonNumber, yunitId, teacherId },
-      });
-
-      if (existingLesson) {
-        return res.status(400).json({
-          error: "Lesson with the same number and teacher already exists",
-        });
+      if (!lesson) {
+        return res.status(404).json({ error: "Lesson not found" });
       }
 
-      const lessonTitle = `[${lessonNumber}] ${lessonName}`;
+      // Handle uploaded video file
+      if (req.file) {
+        // Optionally, you can delete the existing video file, if it exists
+        // Example: fs.unlinkSync(path.join(__dirname, "../uploads/lessons", lesson.lessonVideo));
 
-      const newLessonData = {
-        lessonTitle,
-        lessonNumber,
-        lessonName,
-        lessonDescription,
-        yunitId,
-        teacherId,
-      };
-
-      // Check if a thumbnail image and a video file were uploaded
-      if (req.files) {
-        if (req.files.lessonThumbnail) {
-          newLessonData.lessonThumbnail = req.files.lessonThumbnail[0].filename;
-        }
-        if (req.files.lessonVideo) {
-          newLessonData.lessonVideo = req.files.lessonVideo[0].filename;
-        }
+        lesson.lessonVideo = req.file.filename;
+        await lesson.save();
+        res.json(lesson);
+      } else {
+        res.status(400).json({ error: "No video file provided" });
       }
-
-      const newLesson = await Lesson.create(newLessonData);
-      res.status(201).json(newLesson);
     } catch (error) {
-      console.error("Error during Lesson addition:", error);
-      res.status(500).json({ error: "Lesson addition failed" });
+      console.error("Error during Lesson video addition:", error);
+      res.status(500).json({ error: "Lesson video addition failed" });
     }
   }
 );
 
-// Route for viewing a Lesson by ID
-router.get("/view/:lessonId", async (req, res) => {
-  try {
-    const { lessonId } = req.params;
-    const lesson = await Lesson.findByPk(lessonId);
-
-    if (!lesson) {
-      res.status(404).json({ error: "Lesson not found" });
-    } else {
-      res.json(lesson);
-    }
-  } catch (error) {
-    console.error("Error during Lesson view:", error);
-    res.status(500).json({ error: "Lesson retrieval failed" });
-  }
-});
-
-// Route for editing (updating) a Lesson by ID with image and video replacement
+// Route for editing (updating) a Lesson by ID with image replacement
 router.put(
   "/edit/:lessonId",
-  upload.fields([{ name: "lessonThumbnail" }, { name: "lessonVideo" }]),
+  upload.single("lessonThumbnail"),
   async (req, res) => {
     try {
       const { lessonId } = req.params;
@@ -107,32 +106,18 @@ router.put(
         return;
       }
 
-      // Handle uploaded files (image and video)
-      if (req.files) {
-        if (req.files.lessonThumbnail) {
-          // Delete the old image file, if it exists
-          if (lesson.lessonThumbnail) {
-            const oldImageFilePath = path.join(
-              __dirname,
-              "../uploads/lessons",
-              lesson.lessonThumbnail
-            );
-            fs.unlinkSync(oldImageFilePath);
-          }
-          updatedData.lessonThumbnail = req.files.lessonThumbnail[0].filename;
+      // Handle uploaded files (image only)
+      if (req.file) {
+        // Delete the old image file, if it exists
+        if (lesson.lessonThumbnail) {
+          const oldImageFilePath = path.join(
+            __dirname,
+            "../uploads/lessons",
+            lesson.lessonThumbnail
+          );
+          fs.unlinkSync(oldImageFilePath);
         }
-        if (req.files.lessonVideo) {
-          // Delete the old video file, if it exists
-          if (lesson.lessonVideo) {
-            const oldVideoFilePath = path.join(
-              __dirname,
-              "../uploads/lessons",
-              lesson.lessonVideo
-            );
-            fs.unlinkSync(oldVideoFilePath);
-          }
-          updatedData.lessonVideo = req.files.lessonVideo[0].filename;
-        }
+        updatedData.lessonThumbnail = req.file.filename;
       }
 
       await lesson.update(updatedData);
