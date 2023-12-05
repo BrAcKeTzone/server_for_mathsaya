@@ -1,27 +1,32 @@
 const express = require("express");
 const router = express.Router();
 const Lesson = require("../models/LessonModel");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("../config/cloudinaryConfig");
 
-// Define storage for uploaded files and ensure the 'uploads/lessons' directory exists.
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "../uploads/lessons");
-    fs.mkdirSync(uploadDir, { recursive: true }); // Create directory if it doesn't exist
-    cb(null, uploadDir);
+// Define storage for uploaded files using Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "mathsaya_uploads/lessons",
+    public_id_thumbnail: (req, file) => {
+      return `lesson_${Date.now()}`;
+    },
+    public_id_video: (req, file) => {
+      return `lesson_${Date.now()}`;
+    },
   },
-  filename: (req, file, cb) => {
-    // Generate a unique filename, e.g., using Date.now()
-    const uniqueFileName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueFileName);
-  },
+  allowedFormats: ["jpg", "jpeg", "png", "mp4"], // Specify allowed formats
+  timeout: 120000, // in milliseconds
 });
 const upload = multer({ storage: storage });
 
+// Route for adding lesson entry
 router.post("/add", upload.single("lessonThumbnail"), async (req, res) => {
   try {
+    console.log("req.file:", req.file); // Add this line to log req.file
+
     const { lessonNumber, lessonName, lessonDescription, yunitId, teacherId } =
       req.body;
 
@@ -49,7 +54,8 @@ router.post("/add", upload.single("lessonThumbnail"), async (req, res) => {
 
     // Check if a thumbnail image was uploaded
     if (req.file) {
-      newLessonData.lessonThumbnail = req.file.filename;
+      newLessonData.lessonThumbnail = req.file.path;
+      newLessonData.public_id_thumbnail = req.file.filename;
     }
 
     const newLesson = await Lesson.create(newLessonData);
@@ -60,37 +66,6 @@ router.post("/add", upload.single("lessonThumbnail"), async (req, res) => {
   }
 });
 
-// Route for adding a lessonVideo to an existing lesson entry
-router.post(
-  "/addVideo/:lessonId",
-  upload.single("lessonVideo"),
-  async (req, res) => {
-    try {
-      const { lessonId } = req.params;
-      const lesson = await Lesson.findByPk(lessonId);
-
-      if (!lesson) {
-        return res.status(404).json({ error: "Lesson not found" });
-      }
-
-      // Handle uploaded video file
-      if (req.file) {
-        // Optionally, you can delete the existing video file, if it exists
-        // Example: fs.unlinkSync(path.join(__dirname, "../uploads/lessons", lesson.lessonVideo));
-
-        lesson.lessonVideo = req.file.filename;
-        await lesson.save();
-        res.json(lesson);
-      } else {
-        res.status(400).json({ error: "No video file provided" });
-      }
-    } catch (error) {
-      console.error("Error during Lesson video addition:", error);
-      res.status(500).json({ error: "Lesson video addition failed" });
-    }
-  }
-);
-
 // Route for editing (updating) a Lesson by ID with image replacement
 router.put(
   "/edit/:lessonId",
@@ -99,6 +74,7 @@ router.put(
     try {
       const { lessonId } = req.params;
       const updatedData = req.body;
+
       const lesson = await Lesson.findByPk(lessonId);
 
       if (!lesson) {
@@ -108,19 +84,16 @@ router.put(
 
       // Handle uploaded files (image only)
       if (req.file) {
-        // Delete the old image file, if it exists
-        if (lesson.lessonThumbnail) {
-          const oldImageFilePath = path.join(
-            __dirname,
-            "../uploads/lessons",
-            lesson.lessonThumbnail
-          );
-          fs.unlinkSync(oldImageFilePath);
+        if (lesson.lessonThumbnail && lesson.public_id_thumbnail) {
+          await cloudinary.uploader.destroy(lesson.public_id_thumbnail);
         }
-        updatedData.lessonThumbnail = req.file.filename;
+        // Set the lessonThumbnail field to the Cloudinary URL
+        updatedData.lessonThumbnail = req.file.path;
+        updatedData.public_id_thumbnail = req.file.filename;
       }
 
       await lesson.update(updatedData);
+
       res.json(lesson);
     } catch (error) {
       console.error("Error during Lesson edit:", error);
@@ -128,6 +101,26 @@ router.put(
     }
   }
 );
+
+// Route for updating (editing) a Lesson by ID with video replacement
+
+// Route for viewing a Lesson by yunit ID
+router.get("/view/:lessonId", async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+
+    const lesson = await Lesson.findByPk(lessonId);
+
+    if (!lesson) {
+      res.status(404).json({ error: "Lesson not found" });
+    } else {
+      res.json(lesson);
+    }
+  } catch (error) {
+    console.error("Error during Lesson view:", error);
+    res.status(500).json({ error: "Lesson retrieval failed" });
+  }
+});
 
 // Route for deleting a Lesson by ID along with associated files
 router.delete("/delete/:lessonId", async (req, res) => {
@@ -148,26 +141,14 @@ router.delete("/delete/:lessonId", async (req, res) => {
     } else {
       // Check if the lessonThumbnail exists
       if (lesson.lessonThumbnail) {
-        const thumbnailPath = path.join(
-          __dirname,
-          "../uploads/lessons",
-          lesson.lessonThumbnail
-        );
-
-        // Delete the associated thumbnail file
-        fs.unlinkSync(thumbnailPath);
+        // Delete the associated thumbnail file from Cloudinary
+        await cloudinary.uploader.destroy(lesson.public_id_thumbnail);
       }
 
       // Check if the lessonVideo exists
       if (lesson.lessonVideo) {
-        const videoPath = path.join(
-          __dirname,
-          "../uploads/lessons",
-          lesson.lessonVideo
-        );
-
-        // Delete the associated video file
-        fs.unlinkSync(videoPath);
+        // Delete the associated video file from Cloudinary
+        await cloudinary.uploader.destroy(lesson.public_id_video);
       }
 
       res.status(204).send();
@@ -182,10 +163,20 @@ router.delete("/delete/:lessonId", async (req, res) => {
 router.get("/lessons/:yunitId", async (req, res) => {
   try {
     const { yunitId } = req.params;
+
     const lessons = await Lesson.findAll({
       where: { yunitId },
+      attributes: [
+        "lessonId",
+        "lessonTitle",
+        "lessonNumber",
+        "lessonName",
+        "lessonThumbnail",
+        "lessonVideo",
+      ],
       order: [["lessonTitle", "ASC"]],
     });
+
     res.json(lessons);
   } catch (error) {
     console.error("Error getting Lessons for Yunit:", error);

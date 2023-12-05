@@ -6,7 +6,8 @@ const bcrypt = require("bcryptjs");
 
 router.post("/signup", async (req, res) => {
   try {
-    const { firstname, lastname, email, password, gender } = req.body;
+    const { firstname, lastname, email, password, gender, schoolName } =
+      req.body;
 
     const existingTeacher = await Teacher.findOne({ where: { email } });
     if (existingTeacher) {
@@ -21,6 +22,7 @@ router.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
       gender,
+      schoolName,
     });
 
     const token = jwt.sign({ id: newTeacher.id }, "your-secret-key");
@@ -103,11 +105,9 @@ router.get("/teacher/:id", async (req, res) => {
     res.json(teacher);
   } catch (error) {
     console.error("Error during fetching teacher information:", error);
-    res
-      .status(500)
-      .json({
-        error: "Fetching teacher information failed\n " + error.message,
-      });
+    res.status(500).json({
+      error: "Fetching teacher information failed\n " + error.message,
+    });
   }
 });
 

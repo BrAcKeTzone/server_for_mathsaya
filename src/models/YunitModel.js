@@ -23,7 +23,7 @@ const Yunit = sequelize.define("Yunit", {
   },
   yunitThumbnail: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   public_id: {
     type: DataTypes.STRING,

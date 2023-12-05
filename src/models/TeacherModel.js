@@ -23,6 +23,10 @@ const Teacher = sequelize.define("Teacher", {
       isEmail: true,
     },
   },
+  schoolName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,

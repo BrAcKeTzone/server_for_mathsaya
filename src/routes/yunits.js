@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Yunit = require("../models/YunitModel");
 const multer = require("multer");
-const path = require("path");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinaryConfig");
 
@@ -10,13 +9,13 @@ const cloudinary = require("../config/cloudinaryConfig");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "yunits", // Folder where images will be stored in Cloudinary
-    format: async (req, file) => "png", // You can change the format as needed
+    folder: "mathsaya_uploads/yunits", // Folder where images will be stored in Cloudinary
     public_id: (req, file) => {
       // You can customize the public_id here if needed
       return `yunit_${Date.now()}`;
     },
   },
+  allowedFormats: ["jpg", "jpeg", "png"], // Specify allowed formats
   timeout: 60000, // in milliseconds
 });
 const upload = multer({ storage: storage });
@@ -50,10 +49,7 @@ router.post("/add", upload.single("yunitThumbnail"), async (req, res) => {
 
     // Check if a file was uploaded
     if (req.file) {
-      // Set the yunitThumbnail field to the Cloudinary URL
       newYunitData.yunitThumbnail = req.file.path;
-
-      // Retrieve and store the public_id in the newYunitData
       newYunitData.public_id = req.file.filename;
     }
 
@@ -102,19 +98,15 @@ router.put(
 
       // If a new file is uploaded, handle it
       if (req.file) {
-        // Remove the old image file from Cloudinary, if it exists
         if (yunit.yunitThumbnail && yunit.public_id) {
           await cloudinary.uploader.destroy(yunit.public_id);
         }
 
         // Set the yunitThumbnail field to the Cloudinary URL of the new file
         updatedData.yunitThumbnail = req.file.path;
-
-        // Update the public_id with the new file's public_id
         updatedData.public_id = req.file.filename;
       }
 
-      // Update Yunit with the provided data
       await yunit.update(updatedData);
 
       res.json(yunit);

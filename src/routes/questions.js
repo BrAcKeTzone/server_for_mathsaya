@@ -2,55 +2,53 @@ const express = require("express");
 const router = express.Router();
 const Question = require("../models/QuestionModel");
 const sequelize = require("../config/sequelize");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("../config/cloudinaryConfig");
 
-// Define storage for uploaded files and ensure the 'uploads/questions' directory exists.
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "../uploads/questions");
-    fs.mkdirSync(uploadDir, { recursive: true }); // Create directory if it doesn't exist
-    cb(null, uploadDir);
+// Define storage for uploaded files using Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "mathsaya_uploads/questions",
+    public_id: (req, file) => {
+      return `lesson_${Date.now()}`;
+    },
   },
-  filename: (req, file, cb) => {
-    // Generate a unique filename, e.g., using Date.now()
-    const uniqueFileName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueFileName);
-  },
+  allowedFormats: ["jpg", "jpeg", "png"], // Specify allowed formats
+  timeout: 60000, // in milliseconds
 });
 const upload = multer({ storage: storage });
 
 // Route for adding a new Question
-router.post(
-  "/add",
-  upload.fields([{ name: "questionImage" }]),
-  async (req, res) => {
-    try {
-      const { question_text, answer_choices, correct_answer, exerciseId } =
-        req.body;
+router.post("/add", upload.single("questionImage"), async (req, res) => {
+  try {
+    console.log("req.file:", req.file); // Add this line to log req.file
 
-      const newQuestionData = {
-        question_text,
-        answer_choices,
-        correct_answer,
-        exerciseId,
-      };
+    const { question_text, answer_choices, correct_answer, exerciseId } =
+      req.body;
 
-      // Check if an image file was uploaded
-      if (req.files && req.files.questionImage) {
-        newQuestionData.questionImage = req.files.questionImage[0].filename;
-      }
+    const newQuestionData = {
+      question_text,
+      answer_choices,
+      correct_answer,
+      exerciseId,
+    };
 
-      const newQuestion = await Question.create(newQuestionData);
-
-      res.status(201).json(newQuestion);
-    } catch (error) {
-      console.error("Error during Question addition:", error);
-      res.status(500).json({ error: "Question addition failed" });
+    // Check if an image file was uploaded
+    if (req.file) {
+      newQuestionData.questionImage = req.file.path;
+      newQuestionData.public_id = req.file.filename;
     }
+
+    const newQuestion = await Question.create(newQuestionData);
+
+    res.status(201).json(newQuestion);
+  } catch (error) {
+    console.error("Error during Question addition:", error);
+    res.status(500).json({ error: "Question addition failed" });
   }
-);
+});
 
 // Route for viewing a Question by ID
 router.get("/view/:questionId", async (req, res) => {
@@ -71,26 +69,40 @@ router.get("/view/:questionId", async (req, res) => {
 });
 
 // Route for editing (updating) a Question by ID
-router.put("/edit/:questionId", async (req, res) => {
-  try {
-    const { questionId } = req.params;
-    const updatedData = req.body;
+router.put(
+  "/edit/:questionId",
+  upload.single("questionImage"),
+  async (req, res) => {
+    try {
+      const { questionId } = req.params;
+      const updatedData = req.body;
 
-    const question = await Question.findByPk(questionId);
+      const question = await Question.findByPk(questionId);
 
-    if (!question) {
-      res.status(404).json({ error: "Question not found" });
-      return;
+      if (!question) {
+        res.status(404).json({ error: "Question not found" });
+        return;
+      }
+
+      // Handle uploaded files (image only)
+      if (req.file) {
+        if (question.questionImage && question.public_id) {
+          await cloudinary.uploader.destroy(question.public_id);
+        }
+        // Set the questionImage field to the Cloudinary URL
+        updatedData.questionImage = req.file.path;
+        updatedData.public_id = req.file.filename;
+      }
+
+      await question.update(updatedData);
+
+      res.json(question);
+    } catch (error) {
+      console.error("Error during Question edit:", error);
+      res.status(500).json({ error: "Question edit failed" });
     }
-
-    await question.update(updatedData);
-
-    res.json(question);
-  } catch (error) {
-    console.error("Error during Question edit:", error);
-    res.status(500).json({ error: "Question edit failed" });
   }
-});
+);
 
 // Route for deleting a Question by ID
 router.delete("/delete/:questionId", async (req, res) => {
