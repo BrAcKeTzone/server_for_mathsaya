@@ -9,10 +9,11 @@ const cloudinary = require("../config/cloudinaryConfig");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
+    resource_type: "image",
     folder: "mathsaya_uploads/yunits", // Folder where images will be stored in Cloudinary
     public_id: (req, file) => {
       // You can customize the public_id here if needed
-      return `yunit_${Date.now()}`;
+      return `yunit_${Date.now()}_${file.originalname}`;
     },
   },
   allowedFormats: ["jpg", "jpeg", "png"], // Specify allowed formats

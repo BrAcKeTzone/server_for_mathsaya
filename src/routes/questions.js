@@ -10,9 +10,10 @@ const cloudinary = require("../config/cloudinaryConfig");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
+    resource_type: "image",
     folder: "mathsaya_uploads/questions",
     public_id: (req, file) => {
-      return `lesson_${Date.now()}`;
+      return `lesson_${Date.now()}_${file.originalname}`;
     },
   },
   allowedFormats: ["jpg", "jpeg", "png"], // Specify allowed formats
@@ -122,18 +123,11 @@ router.delete("/delete/:questionId", async (req, res) => {
     if (deletedCount === 0) {
       res.status(404).json({ error: "Question not found" });
     } else {
-      // Check if the questionImage exists
-      if (question.questionImage) {
-        const imagePath = path.join(
-          __dirname,
-          "../uploads/questions",
-          question.questionImage
-        );
-
-        // Delete the associated image file
-        fs.unlinkSync(imagePath);
+      if (question.questionImage && question.public_id) {
+        // Check if a thumbnail file is associated with the Yunit
+        // Delete the associated thumbnail file from Cloudinary
+        await cloudinary.uploader.destroy(question.public_id);
       }
-
       res.status(204).send();
     }
   } catch (error) {

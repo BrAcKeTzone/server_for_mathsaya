@@ -9,15 +9,16 @@ const cloudinary = require("../config/cloudinaryConfig");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
+    resource_type: "auto",
     folder: "mathsaya_uploads/lessons",
     public_id_thumbnail: (req, file) => {
-      return `lesson_${Date.now()}`;
+      return `lesson_${Date.now()}_${file.originalname}`;
     },
     public_id_video: (req, file) => {
-      return `lesson_${Date.now()}`;
+      return `lesson_${Date.now()}_${file.originalname}`;
     },
   },
-  allowedFormats: ["jpg", "jpeg", "png", "mp4"], // Specify allowed formats
+  allowedFormats: ["jpg", "jpeg", "png", "mp4"],
   timeout: 120000, // in milliseconds
 });
 const upload = multer({ storage: storage });
@@ -65,6 +66,45 @@ router.post("/add", upload.single("lessonThumbnail"), async (req, res) => {
     res.status(500).json({ error: "Lesson addition failed" });
   }
 });
+
+// Route for uploading a video for a specific lesson
+router.put(
+  "/upload-video/:lessonId",
+  upload.single("lessonVideo"),
+  async (req, res) => {
+    try {
+      const { lessonId } = req.params;
+
+      // Check if the lesson exists
+      const lesson = await Lesson.findByPk(lessonId);
+      if (!lesson) {
+        return res.status(404).json({ error: "Lesson not found" });
+      }
+
+      // Upload the video file and store the URL and public ID
+      if (req.file) {
+        // Check if the lesson already has a video
+        if (lesson.lessonVideo) {
+          // Delete the existing video file from Cloudinary
+          await cloudinary.uploader.destroy(lesson.public_id_video);
+        }
+
+        // Update the lessonVideo and public_id_video fields in the database
+        await lesson.update({
+          lessonVideo: req.file.path,
+          public_id_video: req.file.filename,
+        });
+
+        res.json({ message: "Video uploaded successfully" });
+      } else {
+        res.status(400).json({ error: "No video file provided" });
+      }
+    } catch (error) {
+      console.error("Error uploading video:", error);
+      res.status(500).json({ error: "Video upload failed" });
+    }
+  }
+);
 
 // Route for editing (updating) a Lesson by ID with image replacement
 router.put(
