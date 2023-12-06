@@ -16,6 +16,7 @@ const yunitsRouter = require("./routes/yunits");
 const lessonsRouter = require("./routes/lessons");
 const exercisesRouter = require("./routes/exercises");
 const questionsRouter = require("./routes/questions");
+const otpRouter = require("./routes/otp");
 
 // Load environment variables from a .env file
 dotenv.config();
@@ -51,6 +52,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Set up routes for various API endpoints
 app.use("/superadmin", superadminRouter);
+app.use("/otp", otpRouter);
 app.use("/teachers", teachersRouter);
 app.use("/sections", sectionsRouter);
 app.use("/students", studentsRouter);
