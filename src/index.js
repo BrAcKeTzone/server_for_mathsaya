@@ -4,7 +4,6 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const sequelize = require("./config/sequelize");
-const path = require("path");
 
 const superadminRouter = require("./routes/superadmin");
 const teachersRouter = require("./routes/teachers");
@@ -16,7 +15,6 @@ const yunitsRouter = require("./routes/yunits");
 const lessonsRouter = require("./routes/lessons");
 const exercisesRouter = require("./routes/exercises");
 const questionsRouter = require("./routes/questions");
-const otpRouter = require("./routes/otp");
 
 // Load environment variables from a .env file
 dotenv.config();
@@ -47,12 +45,8 @@ app.options("*", (req, res) => {
 
 app.use(bodyParser.json());
 
-// Serve static files from the "uploads" directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 // Set up routes for various API endpoints
 app.use("/superadmin", superadminRouter);
-app.use("/otp", otpRouter);
 app.use("/teachers", teachersRouter);
 app.use("/sections", sectionsRouter);
 app.use("/students", studentsRouter);

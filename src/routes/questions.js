@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Question = require("../models/QuestionModel");
-const sequelize = require("../config/sequelize");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 const cloudinary = require("../config/cloudinaryConfig");
+const questionsController = require("../controllers/questionsController");
 
-// Define storage for uploaded files using Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -16,141 +14,30 @@ const storage = new CloudinaryStorage({
       return `lesson_${Date.now()}_${file.originalname}`;
     },
   },
-  allowedFormats: ["jpg", "jpeg", "png"], // Specify allowed formats
-  timeout: 60000, // in milliseconds
+  allowedFormats: ["jpg", "jpeg", "png"],
+  timeout: 60000 * 5,
 });
 const upload = multer({ storage: storage });
 
-// Route for adding a new Question
-router.post("/add", upload.single("questionImage"), async (req, res) => {
-  try {
-    console.log("req.file:", req.file); // Add this line to log req.file
+router.post(
+  "/add",
+  upload.single("questionImage"),
+  questionsController.addQuestion
+);
 
-    const { question_text, answer_choices, correct_answer, exerciseId } =
-      req.body;
-
-    const newQuestionData = {
-      question_text,
-      answer_choices,
-      correct_answer,
-      exerciseId,
-    };
-
-    // Check if an image file was uploaded
-    if (req.file) {
-      newQuestionData.questionImage = req.file.path;
-      newQuestionData.public_id = req.file.filename;
-    }
-
-    const newQuestion = await Question.create(newQuestionData);
-
-    res.status(201).json(newQuestion);
-  } catch (error) {
-    console.error("Error during Question addition:", error);
-    res.status(500).json({ error: "Question addition failed" });
-  }
-});
-
-// Route for viewing a Question by ID
-router.get("/view/:questionId", async (req, res) => {
-  try {
-    const { questionId } = req.params;
-
-    const question = await Question.findByPk(questionId);
-
-    if (!question) {
-      res.status(404).json({ error: "Question not found" });
-    } else {
-      res.json(question);
-    }
-  } catch (error) {
-    console.error("Error during Question view:", error);
-    res.status(500).json({ error: "Question retrieval failed" });
-  }
-});
-
-// Route for editing (updating) a Question by ID
 router.put(
   "/edit/:questionId",
   upload.single("questionImage"),
-  async (req, res) => {
-    try {
-      const { questionId } = req.params;
-      const updatedData = req.body;
-
-      const question = await Question.findByPk(questionId);
-
-      if (!question) {
-        res.status(404).json({ error: "Question not found" });
-        return;
-      }
-
-      // Handle uploaded files (image only)
-      if (req.file) {
-        if (question.questionImage && question.public_id) {
-          await cloudinary.uploader.destroy(question.public_id);
-        }
-        // Set the questionImage field to the Cloudinary URL
-        updatedData.questionImage = req.file.path;
-        updatedData.public_id = req.file.filename;
-      }
-
-      await question.update(updatedData);
-
-      res.json(question);
-    } catch (error) {
-      console.error("Error during Question edit:", error);
-      res.status(500).json({ error: "Question edit failed" });
-    }
-  }
+  questionsController.editQuestion
 );
 
-// Route for deleting a Question by ID
-router.delete("/delete/:questionId", async (req, res) => {
-  try {
-    const { questionId } = req.params;
+router.get("/view/:questionId", questionsController.viewQuestion);
 
-    const question = await Question.findByPk(questionId);
+router.delete("/delete/:questionId", questionsController.deleteQuestion);
 
-    if (!question) {
-      res.status(404).json({ error: "Question not found" });
-      return;
-    }
-
-    // Attempt to delete the question from the database
-    const deletedCount = await Question.destroy({ where: { questionId } });
-
-    if (deletedCount === 0) {
-      res.status(404).json({ error: "Question not found" });
-    } else {
-      if (question.questionImage && question.public_id) {
-        // Check if a thumbnail file is associated with the Yunit
-        // Delete the associated thumbnail file from Cloudinary
-        await cloudinary.uploader.destroy(question.public_id);
-      }
-      res.status(204).send();
-    }
-  } catch (error) {
-    console.error("Error during Question deletion:", error);
-    res.status(500).json({ error: "Question deletion failed" });
-  }
-});
-
-// Route for getting all questions for a specific exercise
-router.get("/questions/:exerciseId", async (req, res) => {
-  try {
-    const { exerciseId } = req.params;
-
-    const questions = await Question.findAll({
-      where: { exerciseId },
-      order: sequelize.literal("RAND()"),
-    });
-
-    res.json(questions);
-  } catch (error) {
-    console.error("Error getting questions for an exercise:", error);
-    res.status(500).json({ error: "Failed to get questions" });
-  }
-});
+router.get(
+  "/questions/:exerciseId",
+  questionsController.getQuestionsByExercise
+);
 
 module.exports = router;
