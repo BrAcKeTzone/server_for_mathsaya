@@ -3,11 +3,10 @@ const cloudinary = require("../config/cloudinaryConfig");
 
 async function addYunit(req, res) {
   try {
-    console.log("req.file:", req.file); // Add this line to log req.file
+    console.log("req.file:", req.file);
 
     const { yunitNumber, yunitName, teacherId } = req.body;
 
-    // Check if a Yunit with the same yunitNumber and teacherId already exists
     const existingYunit = await Yunit.findOne({
       where: { yunitNumber, teacherId },
     });
@@ -27,7 +26,6 @@ async function addYunit(req, res) {
       teacherId,
     };
 
-    // Check if a file was uploaded
     if (req.file) {
       newYunitData.yunitThumbnail = req.file.path;
       newYunitData.public_id = req.file.filename;
@@ -71,13 +69,11 @@ async function editYunit(req, res) {
       return;
     }
 
-    // If a new file is uploaded, handle it
     if (req.file) {
       if (yunit.yunitThumbnail && yunit.public_id) {
         await cloudinary.uploader.destroy(yunit.public_id);
       }
 
-      // Set the yunitThumbnail field to the Cloudinary URL of the new file
       updatedData.yunitThumbnail = req.file.path;
       updatedData.public_id = req.file.filename;
     }
@@ -95,7 +91,6 @@ async function deleteYunit(req, res) {
   try {
     const { yunitId } = req.params;
 
-    // Find the Yunit by ID to get the associated thumbnail filename and public_id
     const yunit = await Yunit.findByPk(yunitId);
 
     if (!yunit) {
@@ -103,15 +98,12 @@ async function deleteYunit(req, res) {
       return;
     }
 
-    // Delete the Yunit from the database
     const deletedCount = await Yunit.destroy({ where: { yunitId } });
 
     if (deletedCount === 0) {
       res.status(404).json({ error: "Yunit not found" });
     } else {
       if (yunit.yunitThumbnail && yunit.public_id) {
-        // Check if a thumbnail file is associated with the Yunit
-        // Delete the associated thumbnail file from Cloudinary
         await cloudinary.uploader.destroy(yunit.public_id);
       }
       res.status(204).send();
@@ -128,14 +120,7 @@ async function getYunitsByTeacher(req, res) {
 
     const yunits = await Yunit.findAll({
       where: { teacherId },
-      attributes: [
-        "yunitId",
-        "yunitTitle",
-        "yunitNumber",
-        "yunitName",
-        "yunitThumbnail",
-      ],
-      order: [["yunitTitle", "ASC"]],
+      order: [["yunitNumber", "ASC"]],
     });
 
     res.json(yunits);

@@ -1,9 +1,10 @@
+const sequelize = require("sequelize");
 const Question = require("../models/QuestionModel");
 const cloudinary = require("../config/cloudinaryConfig");
 
 async function addQuestion(req, res) {
   try {
-    console.log("req.file:", req.file); // Add this line to log req.file
+    console.log("req.file:", req.file);
 
     const { question_text, answer_choices, correct_answer, exerciseId } =
       req.body;
@@ -15,7 +16,6 @@ async function addQuestion(req, res) {
       exerciseId,
     };
 
-    // Check if an image file was uploaded
     if (req.file) {
       newQuestionData.questionImage = req.file.path;
       newQuestionData.public_id = req.file.filename;
@@ -42,12 +42,10 @@ async function editQuestion(req, res) {
       return;
     }
 
-    // Handle uploaded files (image only)
     if (req.file) {
       if (question.questionImage && question.public_id) {
         await cloudinary.uploader.destroy(question.public_id);
       }
-      // Set the questionImage field to the Cloudinary URL
       updatedData.questionImage = req.file.path;
       updatedData.public_id = req.file.filename;
     }
@@ -89,15 +87,12 @@ async function deleteQuestion(req, res) {
       return;
     }
 
-    // Attempt to delete the question from the database
     const deletedCount = await Question.destroy({ where: { questionId } });
 
     if (deletedCount === 0) {
       res.status(404).json({ error: "Question not found" });
     } else {
       if (question.questionImage && question.public_id) {
-        // Check if a thumbnail file is associated with the Yunit
-        // Delete the associated thumbnail file from Cloudinary
         await cloudinary.uploader.destroy(question.public_id);
       }
       res.status(204).send();

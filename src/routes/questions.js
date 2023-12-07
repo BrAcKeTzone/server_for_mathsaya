@@ -1,7 +1,7 @@
 const express = require("express");
+const multer = require("multer");
 const router = express.Router();
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
 const cloudinary = require("../config/cloudinaryConfig");
 const questionsController = require("../controllers/questionsController");
 
@@ -25,13 +25,13 @@ router.post(
   questionsController.addQuestion
 );
 
+router.get("/view/:questionId", questionsController.viewQuestion);
+
 router.put(
   "/edit/:questionId",
   upload.single("questionImage"),
   questionsController.editQuestion
 );
-
-router.get("/view/:questionId", questionsController.viewQuestion);
 
 router.delete("/delete/:questionId", questionsController.deleteQuestion);
 

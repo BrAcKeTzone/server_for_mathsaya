@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const exerciseControllers = require("../controllers/exercisesControllers");
+const exerciseController = require("../controllers/exercisesController");
 
-router.post("/add", exerciseControllers.addExercise);
+router.post("/add", exerciseController.addExercise);
 
-router.get("/view/:exerciseId", exerciseControllers.viewExercise);
+router.get("/view/:exerciseId", exerciseController.viewExercise);
 
-router.put("/edit/:exerciseId", exerciseControllers.editExercise);
+router.put("/edit/:exerciseId", exerciseController.editExercise);
 
-router.delete("/delete/:exerciseId", exerciseControllers.deleteExercise);
+router.delete("/delete/:exerciseId", exerciseController.deleteExercise);
 
-router.get("/exercises/:lessonId", exerciseControllers.getExercisesByLesson);
+router.get("/exercises/:lessonId", exerciseController.getExercisesByLesson);
 
 module.exports = router;

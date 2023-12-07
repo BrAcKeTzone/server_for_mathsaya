@@ -3,12 +3,11 @@ const cloudinary = require("../config/cloudinaryConfig");
 
 async function addLesson(req, res) {
   try {
-    console.log("req.file:", req.file); // Add this line to log req.file
+    console.log("req.file:", req.file);
 
     const { lessonNumber, lessonName, lessonDescription, yunitId, teacherId } =
       req.body;
 
-    // Check if a Lesson with the same lessonNumber and teacherId already exists
     const existingLesson = await Lesson.findOne({
       where: { lessonNumber, yunitId, teacherId },
     });
@@ -30,7 +29,6 @@ async function addLesson(req, res) {
       teacherId,
     };
 
-    // Check if a thumbnail image was uploaded
     if (req.file) {
       newLessonData.lessonThumbnail = req.file.path;
       newLessonData.public_id_thumbnail = req.file.filename;
@@ -48,21 +46,16 @@ async function uploadVid(req, res) {
   try {
     const { lessonId } = req.params;
 
-    // Check if the lesson exists
     const lesson = await Lesson.findByPk(lessonId);
     if (!lesson) {
       return res.status(404).json({ error: "Lesson not found" });
     }
 
-    // Upload the video file and store the URL and public ID
     if (req.file) {
-      // Check if the lesson already has a video
       if (lesson.lessonVideo) {
-        // Delete the existing video file from Cloudinary
         await cloudinary.uploader.destroy(lesson.public_id_video);
       }
 
-      // Update the lessonVideo and public_id_video fields in the database
       await lesson.update({
         lessonVideo: req.file.path,
         public_id_video: req.file.filename,
@@ -90,12 +83,10 @@ async function editLesson(req, res) {
       return;
     }
 
-    // Handle uploaded files (image only)
     if (req.file) {
       if (lesson.lessonThumbnail && lesson.public_id_thumbnail) {
         await cloudinary.uploader.destroy(lesson.public_id_thumbnail);
       }
-      // Set the lessonThumbnail field to the Cloudinary URL
       updatedData.lessonThumbnail = req.file.path;
       updatedData.public_id_thumbnail = req.file.filename;
     }
@@ -136,21 +127,16 @@ async function deleteLesson(req, res) {
       return;
     }
 
-    // Attempt to delete the lesson from the database
     const deletedCount = await Lesson.destroy({ where: { lessonId } });
 
     if (deletedCount === 0) {
       res.status(404).json({ error: "Lesson not found" });
     } else {
-      // Check if the lessonThumbnail exists
       if (lesson.lessonThumbnail) {
-        // Delete the associated thumbnail file from Cloudinary
         await cloudinary.uploader.destroy(lesson.public_id_thumbnail);
       }
 
-      // Check if the lessonVideo exists
       if (lesson.lessonVideo) {
-        // Delete the associated video file from Cloudinary
         await cloudinary.uploader.destroy(lesson.public_id_video);
       }
 
@@ -168,15 +154,7 @@ async function getLessonsByYunit(req, res) {
 
     const lessons = await Lesson.findAll({
       where: { yunitId },
-      attributes: [
-        "lessonId",
-        "lessonTitle",
-        "lessonNumber",
-        "lessonName",
-        "lessonThumbnail",
-        "lessonVideo",
-      ],
-      order: [["lessonTitle", "ASC"]],
+      order: [["lessonNumber", "ASC"]],
     });
 
     res.json(lessons);

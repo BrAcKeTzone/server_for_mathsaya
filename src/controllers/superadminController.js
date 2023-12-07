@@ -30,7 +30,9 @@ async function login(req, res) {
 
 async function getTeachers(req, res) {
   try {
-    const teachers = await Teacher.findAll();
+    const teachers = await Teacher.findAll({
+      order: [["createdAt", "DESC"]],
+    });
 
     res.json(teachers);
   } catch (error) {

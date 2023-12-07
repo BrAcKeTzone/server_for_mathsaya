@@ -5,19 +5,17 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinaryConfig");
 const yunitsController = require("../controllers/yunitsController");
 
-// Define storage for uploaded files using Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     resource_type: "image",
-    folder: "mathsaya_uploads/yunits", // Folder where images will be stored in Cloudinary
+    folder: "mathsaya_uploads/yunits",
     public_id: (req, file) => {
-      // You can customize the public_id here if needed
       return `yunit_${Date.now()}_${file.originalname}`;
     },
   },
-  allowedFormats: ["jpg", "jpeg", "png"], // Specify allowed formats
-  timeout: 60000, // in milliseconds
+  allowedFormats: ["jpg", "jpeg", "png"],
+  timeout: 60000,
 });
 const upload = multer({ storage: storage });
 
