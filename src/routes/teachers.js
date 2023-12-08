@@ -4,6 +4,8 @@ const teacherController = require("../controllers/teacherController");
 
 router.post("/signup", teacherController.signup);
 
+router.post("/verify-otp", teacherController.verifyOTP);
+
 router.post("/login", teacherController.login);
 
 router.put("/edit/:id", teacherController.editTeacher);

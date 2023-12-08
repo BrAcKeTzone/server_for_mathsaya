@@ -1,15 +1,48 @@
+const { Op } = require("sequelize");
 const Teacher = require("../models/TeacherModel");
+const OTP = require("../models/ForOTPModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { sendOTPEmail } = require("../services/emailService");
+require("dotenv").config();
 
 async function signup(req, res) {
   try {
-    const { firstname, lastname, email, password, gender, schoolName } =
-      req.body;
+    const { email } = req.body;
 
     const existingTeacher = await Teacher.findOne({ where: { email } });
     if (existingTeacher) {
       return res.status(400).json({ error: "Email already exists" });
+    }
+
+    await OTP.removeExpiredEntries();
+
+    const generatedOTP = await OTP.generateAndStoreOTP(email);
+
+    await sendOTPEmail(email, generatedOTP);
+
+    res.status(200).json({ message: "OTP sent to email for verification" });
+  } catch (error) {
+    console.error("Error during teacher signup:", error);
+    res.status(500).json({ error: "Teacher signup failed" });
+  }
+}
+
+async function verifyOTP(req, res) {
+  try {
+    const { email, otp, firstname, lastname, password, gender, schoolName } =
+      req.body;
+
+    const latestOTP = await OTP.findOne({
+      where: {
+        email,
+        expires: { [Op.gt]: new Date() },
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    if (!latestOTP || latestOTP.otp !== otp) {
+      return res.status(401).json({ error: "Invalid OTP" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,12 +56,14 @@ async function signup(req, res) {
       schoolName,
     });
 
-    const token = jwt.sign({ id: newTeacher.id }, "your-secret-key");
+    await latestOTP.destroy();
+
+    const token = jwt.sign({ id: newTeacher.id }, process.env.SECRET_KEY);
 
     res.status(201).json({ user: newTeacher, token });
   } catch (error) {
-    console.error("Error during teacher signup:", error);
-    res.status(500).json({ error: "Teacher signup failed" });
+    console.error("Error during OTP verification:", error);
+    res.status(500).json({ error: "OTP verification failed" });
   }
 }
 
@@ -48,7 +83,7 @@ async function login(req, res) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: teacher.id }, "your-secret-key");
+    const token = jwt.sign({ id: teacher.id }, process.env.SECRET_KEY);
 
     res.status(200).json({ user: teacher, token });
   } catch (error) {
@@ -111,6 +146,7 @@ async function getTeacherInfo(req, res) {
 
 module.exports = {
   signup,
+  verifyOTP,
   login,
   editTeacher,
   getTeacherInfo,

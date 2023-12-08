@@ -1,4 +1,3 @@
-// Import required modules and packages
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -60,7 +59,6 @@ app.use("/questions", questionsRouter);
 // Start the Express server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  // Connect to the database
   sequelize
     .sync({ force: false }) // Use { force: true } during development to drop and recreate tables
     .then(() => {

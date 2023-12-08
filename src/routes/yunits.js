@@ -15,7 +15,7 @@ const storage = new CloudinaryStorage({
     },
   },
   allowedFormats: ["jpg", "jpeg", "png"],
-  timeout: 60000,
+  timeout: 60000 * 5,
 });
 const upload = multer({ storage: storage });
 
