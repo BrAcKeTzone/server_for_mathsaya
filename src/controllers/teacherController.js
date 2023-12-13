@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const Teacher = require("../models/TeacherModel");
 const OTP = require("../models/ForOTPModel");
+const EmailToAdmin = require("../models/EmailToAdminModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendOTPEmail } = require("../services/emailService");
@@ -144,10 +145,43 @@ async function getTeacherInfo(req, res) {
   }
 }
 
+async function sendEmailToAdmin(req, res) {
+  try {
+    console.log("req.file:", req.file);
+
+    const { teacherId, subject, content, attachment } = req.body;
+
+    const teacher = await Teacher.findByPk(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    const newEmailData = {
+      teacherId,
+      teacherEmail: teacher.email,
+      subject,
+      content,
+      attachment,
+    };
+
+    if (req.file) {
+      newEmailData.attachment = req.file.path;
+      newEmailData.public_id = req.file.filename;
+    }
+
+    const newEmail = await EmailToAdmin.create(newEmailData);
+
+    res.status(201).json({ message: "Email sent to admin", email: newEmail });
+  } catch (error) {
+    console.error("Error during sending email to admin:", error);
+    res.status(500).json({ error: "Sending email to admin failed" });
+  }
+}
 module.exports = {
   signup,
   verifyOTP,
   login,
   editTeacher,
   getTeacherInfo,
+  sendEmailToAdmin,
 };

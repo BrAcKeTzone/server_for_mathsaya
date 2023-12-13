@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 const Student = require("./StudentModel");
-const { v4: uuidv4 } = require("uuid");
 
 const Sprofile = sequelize.define("Sprofile", {
   profileId: {
