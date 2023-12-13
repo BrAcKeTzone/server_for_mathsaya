@@ -104,17 +104,18 @@ async function editTeacher(req, res) {
       return res.status(404).json({ error: "Teacher not found" });
     }
 
-    if (updatedData.email && updatedData.email !== teacher.email) {
-      const existingTeacher = await Teacher.findOne({
-        where: { email: updatedData.email },
-      });
-      if (existingTeacher) {
-        return res.status(400).json({ error: "Email already exists" });
-      }
-    }
-
     if (updatedData.password) {
-      updatedData.password = await bcrypt.hash(updatedData.password, 10);
+      const passwordMatch = await bcrypt.compare(
+        updatedData.currentPassword,
+        teacher.password
+      );
+
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
+
+      delete updatedData.password;
+      delete updatedData.currentPassword;
     }
 
     await teacher.update(updatedData);
@@ -177,6 +178,74 @@ async function sendEmailToAdmin(req, res) {
     res.status(500).json({ error: "Sending email to admin failed" });
   }
 }
+
+async function sendOTPForPasswordChange(req, res) {
+  try {
+    const { email, currentPassword } = req.body;
+
+    const teacher = await Teacher.findOne({ where: { email } });
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      currentPassword,
+      teacher.password
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Incorrect password" });
+    }
+
+    await OTP.removeExpiredEntries(email);
+
+    const generatedOTP = await OTP.generateAndStoreOTP(email);
+
+    await sendOTPEmail(email, generatedOTP);
+
+    res.status(200).json({ message: "OTP sent to email for verification" });
+  } catch (error) {
+    console.error("Error during OTP generation for password change:", error);
+    res.status(500).json({ error: "OTP generation failed" });
+  }
+}
+
+async function verifyOTPForPasswordChange(req, res) {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const latestOTP = await OTP.findOne({
+      where: {
+        email,
+        expires: { [Op.gt]: new Date() },
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    if (!latestOTP || latestOTP.otp !== otp) {
+      return res.status(401).json({ error: "Invalid OTP" });
+    }
+
+    const teacher = await Teacher.findOne({ where: { email } });
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await teacher.update({ password: hashedNewPassword });
+
+    await latestOTP.destroy();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error during OTP verification for password change:", error);
+    res.status(500).json({ error: "OTP verification failed" });
+  }
+}
+
 module.exports = {
   signup,
   verifyOTP,
@@ -184,4 +253,6 @@ module.exports = {
   editTeacher,
   getTeacherInfo,
   sendEmailToAdmin,
+  sendOTPForPasswordChange,
+  verifyOTPForPasswordChange,
 };

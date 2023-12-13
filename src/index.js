@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const sequelize = require("./config/sequelize");
 
 const superadminRouter = require("./routes/superadmin");
+const custSupRouter = require("./routes/custSup");
 const teachersRouter = require("./routes/teachers");
 const sectionsRouter = require("./routes/sections");
 const studentsRouter = require("./routes/students");
@@ -46,6 +47,7 @@ app.use(bodyParser.json());
 
 // Set up routes for various API endpoints
 app.use("/superadmin", superadminRouter);
+app.use("/cust-support", custSupRouter);
 app.use("/teachers", teachersRouter);
 app.use("/sections", sectionsRouter);
 app.use("/students", studentsRouter);

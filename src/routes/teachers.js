@@ -35,4 +35,11 @@ router.post(
   teacherController.sendEmailToAdmin
 );
 
+router.post("/change-password", teacherController.sendOTPForPasswordChange);
+
+router.put(
+  "/change-password/verify",
+  teacherController.verifyOTPForPasswordChange
+);
+
 module.exports = router;
