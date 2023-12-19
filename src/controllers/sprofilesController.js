@@ -30,6 +30,7 @@ async function login(req, res) {
         profileId: student.profileId,
         firstLoginDate: currentDate,
         teacherId: student.teacherId,
+        loginDates: [currentDate],
       });
 
       return res.json({
@@ -37,13 +38,19 @@ async function login(req, res) {
         profile: studentProfile,
       });
     } else if (!studentProfile.firstLoginDate) {
-      await studentProfile.update({ firstLoginDate: currentDate });
+      await studentProfile.update({
+        firstLoginDate: currentDate,
+        loginDates: [currentDate],
+      });
 
       return res.json({
         message: "Returning student, firstLoginDate updated",
         profile: studentProfile,
       });
     } else {
+      await studentProfile.update({
+        loginDates: [...studentProfile.loginDates, currentDate],
+      });
       return res.json({
         message: "Returning student, firstLoginDate is already set",
         profile: studentProfile,

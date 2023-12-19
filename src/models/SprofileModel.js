@@ -12,6 +12,10 @@ const Sprofile = sequelize.define("Sprofile", {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  loginDates: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+  },
   studentId: {
     type: DataTypes.UUID,
     allowNull: false,
@@ -26,4 +30,5 @@ Sprofile.belongsTo(Student, {
   foreignKey: "studentId",
   onDelete: "CASCADE",
 });
+
 module.exports = Sprofile;
