@@ -9,19 +9,15 @@ const Exercise = sequelize.define("Exercise", {
     defaultValue: () => uuidv4(),
     primaryKey: true,
   },
-  exerciseTitle: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  exercise_number: {
+  exerciseNumber: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  exercise_name: {
+  exerciseName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  exercise_description: {
+  exerciseDescription: {
     type: DataTypes.STRING,
     allowNull: true,
   },

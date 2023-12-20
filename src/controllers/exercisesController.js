@@ -3,16 +3,16 @@ const Exercise = require("../models/ExerciseModel");
 async function addExercise(req, res) {
   try {
     const {
-      exercise_number,
-      exercise_name,
-      exercise_description,
+      exerciseNumber,
+      exerciseName,
+      exerciseDescription,
       lessonId,
       teacherId,
     } = req.body;
 
-    // Check if an Exercise with the same exercise_number and teacherId already exists
+    // Check if an Exercise with the same exerciseNumber and teacherId already exists
     const existingExercise = await Exercise.findOne({
-      where: { exercise_number, teacherId, lessonId },
+      where: { exerciseNumber, teacherId, lessonId },
     });
 
     if (existingExercise) {
@@ -21,13 +21,10 @@ async function addExercise(req, res) {
       });
     }
 
-    const exerciseTitle = `[${exercise_number}] ${exercise_name}`;
-
     const newExercise = await Exercise.create({
-      exerciseTitle,
-      exercise_number,
-      exercise_name,
-      exercise_description,
+      exerciseNumber,
+      exerciseName,
+      exerciseDescription,
       lessonId,
       teacherId,
     });
@@ -100,7 +97,7 @@ async function getExercisesByLesson(req, res) {
 
     const exercises = await Exercise.findAll({
       where: { lessonId },
-      order: [["exercise_number", "ASC"]],
+      order: [["exerciseNumber", "ASC"]],
     });
 
     res.json(exercises);

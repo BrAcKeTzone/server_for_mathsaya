@@ -105,7 +105,7 @@ async function getStudentInformation(req, res) {
       where: { studentProfileId },
       include: {
         model: Exercise,
-        attributes: ["exerciseTitle"],
+        attributes: ["exerciseName"],
       },
     });
 
@@ -113,7 +113,7 @@ async function getStudentInformation(req, res) {
       where: { studentProfileId },
       include: {
         model: Lesson,
-        attributes: ["lessonTitle"],
+        attributes: ["lessonName"],
       },
     });
 
@@ -121,7 +121,34 @@ async function getStudentInformation(req, res) {
       where: { studentProfileId },
       include: {
         model: Yunit,
-        attributes: ["yunitTitle"],
+        attributes: ["yunitName"],
+      },
+    });
+
+    const minExercise = await CompletedExercise.findOne({
+      where: { studentProfileId },
+      order: [["starRating", "ASC"]],
+      include: {
+        model: Exercise,
+        attributes: ["exerciseName"],
+      },
+    });
+
+    const minLesson = await CompletedLesson.findOne({
+      where: { studentProfileId },
+      order: [["starRating", "ASC"]],
+      include: {
+        model: Lesson,
+        attributes: ["lessonName"],
+      },
+    });
+
+    const minYunit = await CompletedUnit.findOne({
+      where: { studentProfileId },
+      order: [["starRating", "ASC"]],
+      include: {
+        model: Yunit,
+        attributes: ["yunitName"],
       },
     });
 
@@ -131,6 +158,9 @@ async function getStudentInformation(req, res) {
       completedExercises,
       completedLessons,
       completedUnits,
+      minExercise,
+      minLesson,
+      minYunit,
     };
 
     return res.json(studentProfileWithInfo);
@@ -247,47 +277,6 @@ async function addCompletedYunit(req, res) {
   }
 }
 
-async function getMinRatings(req, res) {
-  const studentProfileId = req.params.studentProfileId;
-  try {
-    const minExercise = await CompletedExercise.findOne({
-      where: { studentProfileId },
-      order: [["starRating", "ASC"]],
-      include: {
-        model: Exercise,
-        attributes: ["exerciseTitle"],
-      },
-    });
-
-    const minLesson = await CompletedLesson.findOne({
-      where: { studentProfileId },
-      order: [["starRating", "ASC"]],
-      include: {
-        model: Lesson,
-        attributes: ["lessonTitle"],
-      },
-    });
-
-    const minYunit = await CompletedUnit.findOne({
-      where: { studentProfileId },
-      order: [["starRating", "ASC"]],
-      include: {
-        model: Yunit,
-        attributes: ["yunitTitle"],
-      },
-    });
-
-    return res.json({
-      minExercise,
-      minLesson,
-      minYunit,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-}
-
 module.exports = {
   login,
   getStudentProfileId,
@@ -295,5 +284,4 @@ module.exports = {
   addCompletedExercise,
   addCompletedLesson,
   addCompletedYunit,
-  getMinRatings,
 };

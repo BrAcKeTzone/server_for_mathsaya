@@ -18,10 +18,7 @@ async function addLesson(req, res) {
       });
     }
 
-    const lessonTitle = `[${lessonNumber}] ${lessonName}`;
-
     const newLessonData = {
-      lessonTitle,
       lessonNumber,
       lessonName,
       lessonDescription,

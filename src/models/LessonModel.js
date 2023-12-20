@@ -9,10 +9,6 @@ const Lesson = sequelize.define("Lesson", {
     defaultValue: () => uuidv4(),
     primaryKey: true,
   },
-  lessonTitle: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   lessonNumber: {
     type: DataTypes.INTEGER,
     allowNull: false,

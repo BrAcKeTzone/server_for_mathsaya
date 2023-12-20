@@ -17,10 +17,7 @@ async function addYunit(req, res) {
       });
     }
 
-    const yunitTitle = `[${yunitNumber}] ${yunitName}`;
-
     const newYunitData = {
-      yunitTitle,
       yunitNumber,
       yunitName,
       teacherId,

@@ -20,6 +20,4 @@ router.post("/add-completed-lesson", sprofilesContainer.addCompletedLesson);
 
 router.post("/add-completed-yunit", sprofilesContainer.addCompletedYunit);
 
-router.get("/min-ratings/:studentProfileId", sprofilesContainer.getMinRatings);
-
 module.exports = router;

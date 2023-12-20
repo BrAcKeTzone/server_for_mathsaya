@@ -9,10 +9,6 @@ const Yunit = sequelize.define("Yunit", {
     defaultValue: () => uuidv4(),
     primaryKey: true,
   },
-  yunitTitle: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   yunitNumber: {
     type: DataTypes.INTEGER,
     allowNull: false,
