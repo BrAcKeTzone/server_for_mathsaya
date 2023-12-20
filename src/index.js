@@ -16,6 +16,8 @@ const lessonsRouter = require("./routes/lessons");
 const exercisesRouter = require("./routes/exercises");
 const questionsRouter = require("./routes/questions");
 
+const resetRouter = require("./routes/resetSpecificModels");
+
 // Load environment variables from a .env file
 dotenv.config();
 
@@ -46,6 +48,7 @@ app.options("*", (req, res) => {
 app.use(bodyParser.json());
 
 // Set up routes for various API endpoints
+app.use("/reset", resetRouter);
 app.use("/superadmin", superadminRouter);
 app.use("/cust-support", custSupRouter);
 app.use("/teachers", teachersRouter);
@@ -62,7 +65,7 @@ app.use("/questions", questionsRouter);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sequelize
-    .sync({ force: false }) // Use { force: true } during development to drop and recreate tables
+    .sync({ alter: false }) // Use { force: true } during development to drop and recreate tables
     .then(() => {
       console.log("Connected to the database");
     })

@@ -16,6 +16,10 @@ const CompletedExercise = sequelize.define("CompletedExercise", {
     type: DataTypes.UUID,
     allowNull: false,
   },
+  attempts: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 });
 
 CompletedExercise.belongsTo(Exercise, {
