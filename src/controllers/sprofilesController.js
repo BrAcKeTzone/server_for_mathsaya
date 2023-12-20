@@ -1,3 +1,4 @@
+const sequelize = require("sequelize");
 const Sprofile = require("../models/SprofileModel");
 const Student = require("../models/StudentModel");
 const Yunit = require("../models/YunitModel");
@@ -125,9 +126,44 @@ async function getStudentInformation(req, res) {
       },
     });
 
+    const averageStarRatingPerYunit = await CompletedUnit.findAll({
+      attributes: [
+        "yunitId",
+        [sequelize.fn("avg", sequelize.col("starRating")), "averageStarRating"],
+      ],
+      where: { studentProfileId },
+      group: ["yunitId"],
+      include: {
+        model: Yunit,
+        attributes: ["yunitName"],
+      },
+    });
+
+    const averageStarRatingPerLesson = await CompletedLesson.findAll({
+      attributes: [
+        "lessonId",
+        [sequelize.fn("avg", sequelize.col("starRating")), "averageStarRating"],
+      ],
+      where: { studentProfileId },
+      group: ["lessonId"],
+      include: {
+        model: Lesson,
+        attributes: ["lessonName"],
+      },
+    });
+
     const minExercise = await CompletedExercise.findOne({
       where: { studentProfileId },
       order: [["starRating", "ASC"]],
+      include: {
+        model: Exercise,
+        attributes: ["exerciseName"],
+      },
+    });
+
+    const maxExercise = await CompletedExercise.findOne({
+      where: { studentProfileId },
+      order: [["starRating", "DESC"]],
       include: {
         model: Exercise,
         attributes: ["exerciseName"],
@@ -143,9 +179,27 @@ async function getStudentInformation(req, res) {
       },
     });
 
+    const maxLesson = await CompletedLesson.findOne({
+      where: { studentProfileId },
+      order: [["starRating", "DESC"]],
+      include: {
+        model: Lesson,
+        attributes: ["lessonName"],
+      },
+    });
+
     const minYunit = await CompletedUnit.findOne({
       where: { studentProfileId },
       order: [["starRating", "ASC"]],
+      include: {
+        model: Yunit,
+        attributes: ["yunitName"],
+      },
+    });
+
+    const maxYunit = await CompletedUnit.findOne({
+      where: { studentProfileId },
+      order: [["starRating", "DESC"]],
       include: {
         model: Yunit,
         attributes: ["yunitName"],
@@ -158,9 +212,14 @@ async function getStudentInformation(req, res) {
       completedExercises,
       completedLessons,
       completedUnits,
+      averageStarRatingPerYunit,
+      averageStarRatingPerLesson,
       minExercise,
+      maxExercise,
       minLesson,
+      maxLesson,
       minYunit,
+      maxYunit,
     };
 
     return res.json(studentProfileWithInfo);
