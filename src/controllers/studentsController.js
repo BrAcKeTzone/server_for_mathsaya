@@ -2,6 +2,19 @@ const Student = require("../models/StudentModel");
 const RoomSection = require("../models/RoomSectionModel");
 const { v4: uuidv4 } = require("uuid");
 
+async function updateTotalStudents(sectionId) {
+  const totalStudents = await Student.count({
+    where: { sectionId },
+  });
+
+  const section = await RoomSection.findByPk(sectionId);
+
+  if (section) {
+    section.totalStudents = totalStudents;
+    await section.save();
+  }
+}
+
 async function addStudent(req, res) {
   try {
     const { firstname, lastname, username, gender, sectionId, teacherId } =
@@ -18,11 +31,7 @@ async function addStudent(req, res) {
       profileId,
     });
 
-    const section = await RoomSection.findByPk(sectionId);
-    if (section) {
-      section.totalStudents += 1;
-      await section.save();
-    }
+    await updateTotalStudents(sectionId);
 
     res.status(201).json(newStudent);
   } catch (error) {
@@ -82,11 +91,7 @@ async function deleteStudent(req, res) {
 
       await Student.destroy({ where: { studentId } });
 
-      const section = await RoomSection.findByPk(sectionId);
-      if (section) {
-        section.totalStudents -= 1;
-        await section.save();
-      }
+      await updateTotalStudents(sectionId);
 
       res.status(204).send();
     }
