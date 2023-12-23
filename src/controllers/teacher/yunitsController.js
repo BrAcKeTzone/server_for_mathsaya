@@ -1,5 +1,5 @@
-const Yunit = require("../models/YunitModel");
-const cloudinary = require("../config/cloudinaryConfig");
+const Yunit = require("../../models/YunitModel");
+const cloudinary = require("../../config/cloudinaryConfig");
 
 async function addYunit(req, res) {
   try {

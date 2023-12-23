@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinaryConfig");
-const teacherController = require("../controllers/teacherController");
+const teacherController = require("../controllers/teacher/teacherController");
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -27,7 +27,7 @@ router.post("/login", teacherController.login);
 
 router.put("/edit/:id", teacherController.editTeacher);
 
-router.get("/teacher/:id", teacherController.getTeacherInfo);
+router.get("/display/:id", teacherController.getTeacherInfo);
 
 router.post(
   "/send-email",

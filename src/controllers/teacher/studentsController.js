@@ -1,5 +1,5 @@
-const Student = require("../models/StudentModel");
-const RoomSection = require("../models/RoomSectionModel");
+const Student = require("../../models/StudentModel");
+const RoomSection = require("../../models/RoomSectionModel");
 const { v4: uuidv4 } = require("uuid");
 
 async function updateTotalStudents(sectionId) {

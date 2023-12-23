@@ -1,5 +1,5 @@
-const Lesson = require("../models/LessonModel");
-const cloudinary = require("../config/cloudinaryConfig");
+const Lesson = require("../../models/LessonModel");
+const cloudinary = require("../../config/cloudinaryConfig");
 
 async function addLesson(req, res) {
   try {

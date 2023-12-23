@@ -1,10 +1,10 @@
 const { Op } = require("sequelize");
-const Teacher = require("../models/TeacherModel");
-const OTP = require("../models/ForOTPModel");
-const EmailToAdmin = require("../models/EmailToAdminModel");
+const Teacher = require("../../models/TeacherModel");
+const OTP = require("../../models/ForOTPModel");
+const EmailToAdmin = require("../../models/EmailToAdminModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { sendOTPEmail } = require("../services/emailService");
+const { sendOTPEmail } = require("../../services/emailService");
 require("dotenv").config();
 
 async function signup(req, res) {

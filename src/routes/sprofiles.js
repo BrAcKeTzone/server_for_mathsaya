@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const sprofilesContainer = require("../controllers/sprofilesController");
+const sprofilesContainer = require("../controllers/student/sprofilesController");
 
 router.post("/login", sprofilesContainer.login);
 
 router.get(
-  "/get-student-profile/:studentId",
+  "/get-profile-id/:studentId",
   sprofilesContainer.getStudentProfileId
 );
 

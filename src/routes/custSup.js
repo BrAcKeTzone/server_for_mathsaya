@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const custSupController = require("../controllers/custSupController");
+const custSupController = require("../controllers/superadmin/custSupController");
 
-router.get("/cust-support/list", custSupController.listEmailEntries);
+router.get("/list", custSupController.listEmailEntries);
 
-router.get("/cust-support/view/:emailId", custSupController.viewEmailEntry);
+router.get("/view/:emailId", custSupController.viewEmailEntry);
+
+router.get("/unread", custSupController.listUnreadEmailEntries);
+
+router.get("/read", custSupController.listReadEmailEntries);
 
 module.exports = router;

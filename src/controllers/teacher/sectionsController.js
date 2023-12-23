@@ -1,5 +1,5 @@
-const RoomSection = require("../models/RoomSectionModel");
-const Teacher = require("../models/TeacherModel");
+const RoomSection = require("../../models/RoomSectionModel");
+const Teacher = require("../../models/TeacherModel");
 
 async function addSection(req, res) {
   try {

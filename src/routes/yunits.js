@@ -3,7 +3,7 @@ const multer = require("multer");
 const router = express.Router();
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinaryConfig");
-const yunitsController = require("../controllers/yunitsController");
+const yunitsController = require("../controllers/teacher/yunitsController");
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,

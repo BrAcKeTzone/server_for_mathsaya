@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const studentsController = require("../controllers/studentsController");
+const studentsController = require("../controllers/teacher/studentsController");
 
 router.post("/add", studentsController.addStudent);
 
@@ -10,6 +10,6 @@ router.put("/edit/:studentId", studentsController.editStudent);
 
 router.delete("/delete/:studentId", studentsController.deleteStudent);
 
-router.get("/students/:sectionId", studentsController.getStudentsBySection);
+router.get("/list/:sectionId", studentsController.getStudentsBySection);
 
 module.exports = router;

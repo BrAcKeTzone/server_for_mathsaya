@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const exerciseController = require("../controllers/exercisesController");
+const exerciseController = require("../controllers/teacher/exercisesController");
 
 router.post("/add", exerciseController.addExercise);
 

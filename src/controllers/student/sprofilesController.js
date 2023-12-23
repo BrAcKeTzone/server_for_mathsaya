@@ -1,12 +1,12 @@
 const sequelize = require("sequelize");
-const Sprofile = require("../models/SprofileModel");
-const Student = require("../models/StudentModel");
-const Yunit = require("../models/YunitModel");
-const Lesson = require("../models/LessonModel");
-const Exercise = require("../models/ExerciseModel");
-const CompletedExercise = require("../models/CompletedExerciseModel");
-const CompletedLesson = require("../models/CompletedLessonModel");
-const CompletedUnit = require("../models/CompletedUnitModel");
+const Sprofile = require("../../models/SprofileModel");
+const Student = require("../../models/StudentModel");
+const Yunit = require("../../models/YunitModel");
+const Lesson = require("../../models/LessonModel");
+const Exercise = require("../../models/ExerciseModel");
+const CompletedExercise = require("../../models/CompletedExerciseModel");
+const CompletedLesson = require("../../models/CompletedLessonModel");
+const CompletedUnit = require("../../models/CompletedUnitModel");
 
 async function login(req, res) {
   const { firstname, lastname, username } = req.body;

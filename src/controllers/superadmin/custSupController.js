@@ -1,4 +1,4 @@
-const EmailToAdmin = require("../models/EmailToAdminModel");
+const EmailToAdmin = require("../../models/EmailToAdminModel");
 
 async function listEmailEntries(req, res) {
   try {
@@ -50,7 +50,39 @@ async function viewEmailEntry(req, res) {
   }
 }
 
+async function listUnreadEmailEntries(req, res) {
+  try {
+    const unreadEmailEntries = await EmailToAdmin.findAll({
+      where: { status: false },
+      attributes: ["emailId", "teacherEmail", "subject", "createdAt", "status"],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({ emailEntries: unreadEmailEntries });
+  } catch (error) {
+    console.error("Error while fetching unread email entries:", error);
+    res.status(500).json({ error: "Failed to fetch unread email entries" });
+  }
+}
+
+async function listReadEmailEntries(req, res) {
+  try {
+    const readEmailEntries = await EmailToAdmin.findAll({
+      where: { status: true },
+      attributes: ["emailId", "teacherEmail", "subject", "createdAt", "status"],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({ emailEntries: readEmailEntries });
+  } catch (error) {
+    console.error("Error while fetching read email entries:", error);
+    res.status(500).json({ error: "Failed to fetch read email entries" });
+  }
+}
+
 module.exports = {
   listEmailEntries,
   viewEmailEntry,
+  listUnreadEmailEntries,
+  listReadEmailEntries,
 };

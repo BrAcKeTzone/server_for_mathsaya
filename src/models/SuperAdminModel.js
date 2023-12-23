@@ -3,7 +3,7 @@ const sequelize = require("../config/sequelize");
 const { v4: uuidv4 } = require("uuid");
 
 const SuperAdmin = sequelize.define("SuperAdmin", {
-  SuperAdminId: {
+  superAdminId: {
     type: DataTypes.UUID,
     defaultValue: () => uuidv4(),
     primaryKey: true,

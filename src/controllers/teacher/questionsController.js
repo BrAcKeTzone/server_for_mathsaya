@@ -1,6 +1,6 @@
 const sequelize = require("sequelize");
-const Question = require("../models/QuestionModel");
-const cloudinary = require("../config/cloudinaryConfig");
+const Question = require("../../models/QuestionModel");
+const cloudinary = require("../../config/cloudinaryConfig");
 
 async function addQuestion(req, res) {
   try {
