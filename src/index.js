@@ -25,25 +25,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Set up CORS options
-const corsOptions = {
-  origin: ["https://mathsaya4kids.vercel.app"],
-  methods: "GET,PUT,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204,
-};
+// // Set up CORS options
+// const corsOptions = {
+//   origin: ["https://mathsaya4kids.vercel.app"],
+//   methods: "GET,PUT,POST,DELETE",
+//   credentials: true,
+//   optionsSuccessStatus: 204,
+// };
 
 // Enable CORS with specified options
-app.use(cors(corsOptions));
+app.use(cors());
 
-// Handle preflight requests
-app.options("*", (req, res) => {
-  console.log("Handling preflight request");
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.status(200).send();
-});
+// // Handle preflight requests
+// app.options("*", (req, res) => {
+//   console.log("Handling preflight request");
+//   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+//   res.header("Access-Control-Allow-Headers", "Content-Type");
+//   res.header("Access-Control-Allow-Credentials", "true");
+//   res.status(200).send();
+// });
 
 app.use(bodyParser.json());
 

@@ -1,5 +1,15 @@
 const EmailToAdmin = require("../../models/EmailToAdminModel");
 
+async function getTotalEmails(req, res) {
+  try {
+    const totalEmails = await EmailToAdmin.count();
+    res.json({ totalEmails });
+  } catch (error) {
+    console.error("Error during fetching total number of emails:", error);
+    res.status(500).json({ error: "Fetching total emails count failed" });
+  }
+}
+
 async function listEmailEntries(req, res) {
   try {
     const emailEntries = await EmailToAdmin.findAll({
@@ -81,6 +91,7 @@ async function listReadEmailEntries(req, res) {
 }
 
 module.exports = {
+  getTotalEmails,
   listEmailEntries,
   viewEmailEntry,
   listUnreadEmailEntries,
