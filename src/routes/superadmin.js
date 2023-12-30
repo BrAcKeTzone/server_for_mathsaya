@@ -4,6 +4,8 @@ const superadminController = require("../controllers/superadmin/superadminContro
 
 router.post("/login", superadminController.login);
 
+router.post("/check-superadmin/:superAdminId", superadminController.checkSuperAdminExists);
+
 router.get("/teachers", superadminController.getTeachers);
 
 router.get("/total-teachers", superadminController.getTotalTeachers);

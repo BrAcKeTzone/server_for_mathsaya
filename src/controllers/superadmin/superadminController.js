@@ -22,6 +22,21 @@ async function login(req, res) {
   }
 }
 
+async function checkSuperAdminExists(req, res) {
+  try {
+    const { superAdminId } = req.params;
+    const superadmin = await SuperAdmin.findByPk(superAdminId);
+    if (!superadmin) {
+      return res.status(404).json({ error: "SuperAdmin not found" });
+    }
+    res.json({ message: "SuperAdmin exists" });
+  } catch (error) {
+    console.error("Error during checking superadmin existence:", error);
+    res.status(500).json({ error: "Checking superadmin existence failed" });
+  }
+}
+
+
 async function getTeachers(req, res) {
   try {
     const teachers = await Teacher.findAll({
@@ -175,6 +190,7 @@ async function deleteSuperAdmin(req, res) {
 
 module.exports = {
   login,
+  checkSuperAdminExists,
   getTeachers,
   getTotalTeachers,
   editTeacher,
