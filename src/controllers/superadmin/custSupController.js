@@ -1,4 +1,5 @@
 const EmailToAdmin = require("../../models/EmailToAdminModel");
+const cloudinary = require("../../config/cloudinaryConfig");
 
 async function getTotalEmails(req, res) {
   try {
@@ -90,10 +91,40 @@ async function listReadEmailEntries(req, res) {
   }
 }
 
+async function deleteEmailEntry(req, res) {
+  try {
+    const { emailId } = req.params;
+
+    const emailEntry = await EmailToAdmin.findByPk(emailId, {
+      attributes: ["emailId", "attachment", "public_id"],
+    });
+
+    if (!emailEntry) {
+      res.status(404).json({ error: "Email entry not found" });
+      return;
+    }
+
+    const deletedCount = await EmailToAdmin.destroy({ where: { emailId } });
+
+    if (deletedCount === 0) {
+      res.status(404).json({ error: "Email entry not found" });
+    } else {
+      if (emailEntry.attachment && emailEntry.public_id) {
+        await cloudinary.uploader.destroy(emailEntry.public_id);
+      }
+      res.status(204).send();
+    }
+  } catch (error) {
+    console.error("Error during email entry deletion:", error);
+    res.status(500).json({ error: "Email entry deletion failed" });
+  }
+}
+
 module.exports = {
   getTotalEmails,
   listEmailEntries,
   viewEmailEntry,
   listUnreadEmailEntries,
   listReadEmailEntries,
+  deleteEmailEntry,
 };

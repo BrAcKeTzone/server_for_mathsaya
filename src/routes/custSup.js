@@ -12,4 +12,6 @@ router.get("/unread", custSupController.listUnreadEmailEntries);
 
 router.get("/read", custSupController.listReadEmailEntries);
 
+router.delete("/delete/:emailId", custSupController.deleteEmailEntry);
+
 module.exports = router;
