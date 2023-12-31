@@ -20,7 +20,7 @@ async function listEmailEntries(req, res) {
       ],
     });
 
-    res.json({ emailEntries });
+    res.json(emailEntries);
   } catch (error) {
     console.error("Error while fetching email entries:", error);
     res.status(500).json({ error: "Failed to fetch email entries" });
@@ -53,7 +53,7 @@ async function viewEmailEntry(req, res) {
       await emailEntry.update({ status: true });
     }
 
-    res.json({ emailEntry });
+    res.json(emailEntry);
   } catch (error) {
     console.error("Error while viewing email entry:", error);
     res.status(500).json({ error: "Failed to view email entry" });
@@ -68,7 +68,7 @@ async function listUnreadEmailEntries(req, res) {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({ emailEntries: unreadEmailEntries });
+    res.json(unreadEmailEntries);
   } catch (error) {
     console.error("Error while fetching unread email entries:", error);
     res.status(500).json({ error: "Failed to fetch unread email entries" });
@@ -83,7 +83,7 @@ async function listReadEmailEntries(req, res) {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json({ emailEntries: readEmailEntries });
+    res.json(readEmailEntries);
   } catch (error) {
     console.error("Error while fetching read email entries:", error);
     res.status(500).json({ error: "Failed to fetch read email entries" });
