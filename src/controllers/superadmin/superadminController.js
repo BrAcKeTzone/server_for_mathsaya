@@ -36,7 +36,6 @@ async function checkSuperAdminExists(req, res) {
   }
 }
 
-
 async function getTeachers(req, res) {
   try {
     const teachers = await Teacher.findAll({
@@ -188,6 +187,20 @@ async function deleteSuperAdmin(req, res) {
   }
 }
 
+async function getSuperAdminById(req, res) {
+  try {
+    const { superAdminId } = req.params;
+    const superadmin = await SuperAdmin.findByPk(superAdminId);
+    if (!superadmin) {
+      return res.status(404).json({ error: "SuperAdmin not found" });
+    }
+    res.json(superadmin);
+  } catch (error) {
+    console.error("Error during getting superadmin by ID:", error);
+    res.status(500).json({ error: "Getting superadmin by ID failed" });
+  }
+}
+
 module.exports = {
   login,
   checkSuperAdminExists,
@@ -200,4 +213,5 @@ module.exports = {
   addSuperAdmin,
   editSuperAdmin,
   deleteSuperAdmin,
+  getSuperAdminById,
 };

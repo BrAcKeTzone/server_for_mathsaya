@@ -4,7 +4,10 @@ const superadminController = require("../controllers/superadmin/superadminContro
 
 router.post("/login", superadminController.login);
 
-router.post("/check-superadmin/:superAdminId", superadminController.checkSuperAdminExists);
+router.post(
+  "/check-superadmin/:superAdminId",
+  superadminController.checkSuperAdminExists
+);
 
 router.get("/teachers", superadminController.getTeachers);
 
@@ -23,5 +26,7 @@ router.post("/add-superadmin", superadminController.addSuperAdmin);
 router.put("/edit-superadmin/:id", superadminController.editSuperAdmin);
 
 router.delete("/delete-superadmin/:id", superadminController.deleteSuperAdmin);
+
+router.get("/view/:superAdminId", superadminController.getSuperAdminById);
 
 module.exports = router;
