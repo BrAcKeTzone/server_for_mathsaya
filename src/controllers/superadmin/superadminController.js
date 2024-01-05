@@ -148,10 +148,19 @@ async function addSuperAdmin(req, res) {
 async function editSuperAdmin(req, res) {
   try {
     const { id } = req.params;
-    const updatedData = req.body;
+    const { currentPassword, ...updatedData } = req.body;
     const superadmin = await SuperAdmin.findByPk(id);
     if (!superadmin) {
       return res.status(404).json({ error: "SuperAdmin not found" });
+    }
+    if (currentPassword) {
+      const passwordMatch = await bcrypt.compare(
+        currentPassword,
+        superadmin.password
+      );
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Incorrect current password" });
+      }
     }
     if (updatedData.email && updatedData.email !== superadmin.email) {
       const existingTeacher = await SuperAdmin.findOne({
