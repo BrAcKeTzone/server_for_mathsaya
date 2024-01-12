@@ -93,6 +93,20 @@ async function login(req, res) {
   }
 }
 
+async function checkTeacherExists(req, res) {
+  try {
+    const { id } = req.params;
+    const teacher = await Teacher.findByPk(id);
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+    res.json({ message: "Teacher exists" });
+  } catch (error) {
+    console.error("Error during checking teacher existence:", error);
+    res.status(500).json({ error: "Checking teacher existence failed" });
+  }
+}
+
 async function editTeacher(req, res) {
   try {
     const { id } = req.params;
@@ -250,6 +264,7 @@ module.exports = {
   signup,
   verifyOTP,
   login,
+  checkTeacherExists,
   editTeacher,
   getTeacherInfo,
   sendEmailToAdmin,

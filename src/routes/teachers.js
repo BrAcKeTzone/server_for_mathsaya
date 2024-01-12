@@ -25,6 +25,8 @@ router.post("/verify-otp", teacherController.verifyOTP);
 
 router.post("/login", teacherController.login);
 
+router.get("/check-teacher/:id", teacherController.checkTeacherExists);
+
 router.put("/edit/:id", teacherController.editTeacher);
 
 router.get("/display/:id", teacherController.getTeacherInfo);
