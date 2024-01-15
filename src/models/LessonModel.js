@@ -18,7 +18,7 @@ const Lesson = sequelize.define("Lesson", {
     allowNull: false,
   },
   lessonDescription: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   lessonThumbnail: {
