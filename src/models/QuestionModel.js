@@ -19,7 +19,7 @@ const Question = sequelize.define("Question", {
   },
   public_id: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   answer_choices: {
     type: DataTypes.JSON,
