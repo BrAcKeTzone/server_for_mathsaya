@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3001;
 const corsOptions = {
   origin: [
     "https://mathsaya4kids.vercel.app",
-    // "https://mathsaya4kids.netlify.app",
+    "https://mathsaya4kids.netlify.app",
   ],
   methods: "GET,PUT,POST,DELETE",
   credentials: true,
@@ -39,6 +39,7 @@ app.use(cors(corsOptions));
 // Handle preflight requests
 app.options("*", (req, res) => {
   console.log("Handling preflight request");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type");
   res.header("Access-Control-Allow-Credentials", "true");
