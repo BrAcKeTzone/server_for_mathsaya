@@ -30,7 +30,7 @@ async function login(req, res) {
         studentId: student.studentId,
         profileId: student.profileId,
         firstLoginDate: currentDate,
-        teacherId: student.teacherId,
+        userId: student.userId,
         loginDates: [currentDate],
       });
 

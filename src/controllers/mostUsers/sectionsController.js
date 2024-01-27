@@ -38,6 +38,34 @@ async function viewSection(req, res) {
   }
 }
 
+async function editSection(req, res) {
+  try {
+    const { sectionId } = req.params;
+    const { sectionName, schoolYear, userId } = req.body;
+
+    const updatedRoomSection = await RoomSection.update(
+      {
+        sectionName,
+        schoolYear,
+        userId,
+      },
+      {
+        where: { sectionId },
+        returning: true,
+      }
+    );
+
+    if (updatedRoomSection[0] === 0) {
+      res.status(404).json({ error: "Room section not found" });
+    } else {
+      res.json(updatedRoomSection[1][0]); // Return the updated room section
+    }
+  } catch (error) {
+    console.error("Error during room section edit:", error);
+    res.status(500).json({ error: "Room section edit failed" });
+  }
+}
+
 async function deleteSection(req, res) {
   try {
     const { sectionId } = req.params;
@@ -83,6 +111,7 @@ async function getSectionsByTeacher(req, res) {
 module.exports = {
   addSection,
   viewSection,
+  editSection,
   deleteSection,
   getSectionsByTeacher,
 };
