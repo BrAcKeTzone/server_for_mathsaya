@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3001;
 const corsOptions = {
   origin: [
     "https://mathsaya4kids.vercel.app",
-    "https://mathsaya4kids.netlify.app",
+    // "https://mathsaya4kids.netlify.app",
   ],
   methods: "GET,PUT,POST,DELETE",
   credentials: true,
