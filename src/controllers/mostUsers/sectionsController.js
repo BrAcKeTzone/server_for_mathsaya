@@ -1,9 +1,8 @@
 const RoomSection = require("../../models/RoomSectionModel");
-const Teacher = require("../../models/TeacherModel");
 
 async function addSection(req, res) {
   try {
-    const { sectionName, schoolYear, teacherId } = req.body;
+    const { sectionName, schoolYear, userId } = req.body;
 
     const sectionId = `${schoolYear} ${sectionName}`;
 
@@ -11,7 +10,7 @@ async function addSection(req, res) {
       sectionId,
       sectionName,
       schoolYear,
-      teacherId,
+      userId,
       totalStudents: 0,
     });
 
@@ -60,22 +59,15 @@ async function deleteSection(req, res) {
 
 async function getSectionsByTeacher(req, res) {
   try {
-    const { teacherId } = req.params;
-
-    const teacher = await Teacher.findByPk(teacherId);
-
-    if (!teacher) {
-      res.status(404).json({ error: "Teacher not found" });
-      return;
-    }
+    const { userId } = req.params;
 
     const sections = await RoomSection.findAll({
-      where: { teacherId },
+      where: { userId },
       attributes: [
         "sectionId",
         "sectionName",
         "schoolYear",
-        "teacherId",
+        "userId",
         "totalStudents",
       ],
       order: [["schoolYear", "ASC"]],

@@ -17,7 +17,7 @@ async function updateTotalStudents(sectionId) {
 
 async function addStudent(req, res) {
   try {
-    const { firstname, lastname, username, gender, sectionId, teacherId } =
+    const { firstname, lastname, username, gender, sectionId, userId } =
       req.body;
     const profileId = uuidv4();
 
@@ -27,7 +27,7 @@ async function addStudent(req, res) {
       username,
       gender,
       sectionId,
-      teacherId,
+      userId,
       profileId,
     });
 

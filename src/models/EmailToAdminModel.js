@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
-const Teacher = require("../models/TeacherModel");
+const User = require("../models/UserModel");
 const { v4: uuidv4 } = require("uuid");
 
 const EmailToAdmin = sequelize.define("EmailToAdmin", {
@@ -38,8 +38,8 @@ const EmailToAdmin = sequelize.define("EmailToAdmin", {
   },
 });
 
-EmailToAdmin.belongsTo(Teacher, {
-  foreignKey: "teacherId",
+EmailToAdmin.belongsTo(User, {
+  foreignKey: "userId",
   onDelete: "CASCADE",
 });
 

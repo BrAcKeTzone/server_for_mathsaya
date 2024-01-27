@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
-const Teacher = require("./TeacherModel");
+const User = require("./UserModel");
 const { v4: uuidv4 } = require("uuid");
 
 const Yunit = sequelize.define("Yunit", {
@@ -25,14 +25,14 @@ const Yunit = sequelize.define("Yunit", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  teacherId: {
-    type: DataTypes.INTEGER,
+  userId: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
 });
 
-Yunit.belongsTo(Teacher, {
-  foreignKey: "teacherId",
+Yunit.belongsTo(User, {
+  foreignKey: "userId",
   onDelete: "CASCADE",
 });
 

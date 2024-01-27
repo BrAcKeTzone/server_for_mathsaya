@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const sprofilesContainer = require("../controllers/student/sprofilesController");
+const sprofilesContainer = require("../controllers/studentOnly/sprofilesController");
 
 router.post("/login", sprofilesContainer.login);
 

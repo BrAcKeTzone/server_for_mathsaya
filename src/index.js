@@ -4,19 +4,15 @@ const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const sequelize = require("./config/sequelize");
 
-const superadminRouter = require("./routes/superadmin");
-const custSupRouter = require("./routes/custSup");
-const teachersRouter = require("./routes/teachers");
-const sectionsRouter = require("./routes/sections");
-const studentsRouter = require("./routes/students");
-const sprofileRouter = require("./routes/sprofiles");
-const dashboardRouter = require("./routes/dashboard");
-const yunitsRouter = require("./routes/yunits");
-const lessonsRouter = require("./routes/lessons");
-const exercisesRouter = require("./routes/exercises");
-const questionsRouter = require("./routes/questions");
-
-const resetRouter = require("./routes/resetSpecificModels");
+const authRouter = require("./routes/authRoutes");
+const userRouter = require("./routes/userRoutes");
+const sectionsRouter = require("./routes/sectionRoutes");
+const studentsRouter = require("./routes/studentRoutes");
+const sprofileRouter = require("./routes/sprofileRoutes");
+const unitsRouter = require("./routes/unitRoutes");
+const lessonsRouter = require("./routes/lessonRoutes");
+const exercisesRouter = require("./routes/exerciseRoutes");
+const questionsRouter = require("./routes/questionRoutes");
 
 // Load environment variables from a .env file
 dotenv.config();
@@ -27,7 +23,10 @@ const PORT = process.env.PORT || 3001;
 
 // Set up CORS options
 const corsOptions = {
-  origin: ["https://mathsaya4kids.vercel.app"],
+  origin: [
+    "https://mathsaya4kids.vercel.app",
+    "https://mathsaya4kids.netlify.app",
+  ],
   methods: "GET,PUT,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
@@ -49,15 +48,12 @@ app.options("*", (req, res) => {
 app.use(bodyParser.json());
 
 // Set up routes for various API endpoints
-app.use("/reset", resetRouter);
-app.use("/superadmin", superadminRouter);
-app.use("/cust-support", custSupRouter);
-app.use("/teachers", teachersRouter);
+app.use("/auth", authRouter);
+app.use("/user", userRouter);
 app.use("/sections", sectionsRouter);
 app.use("/students", studentsRouter);
 app.use("/sprofile", sprofileRouter);
-app.use("/dashboard", dashboardRouter);
-app.use("/yunits", yunitsRouter);
+app.use("/units", unitsRouter);
 app.use("/lessons", lessonsRouter);
 app.use("/exercises", exercisesRouter);
 app.use("/questions", questionsRouter);
@@ -66,7 +62,7 @@ app.use("/questions", questionsRouter);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sequelize
-    .sync({ alter: false }) // Use { force: true } during development to drop and recreate tables
+    .sync({ alter: false }) // Use { force: true } or { alter: true } during development to drop and recreate tables
     .then(() => {
       console.log("Connected to the database");
     })

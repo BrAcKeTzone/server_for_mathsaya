@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
-const Teacher = require("./TeacherModel");
+const User = require("./UserModel");
 
 const RoomSection = sequelize.define("RoomSection", {
   sectionId: {
@@ -15,8 +15,8 @@ const RoomSection = sequelize.define("RoomSection", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  teacherId: {
-    type: DataTypes.INTEGER,
+  userId: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
   totalStudents: {
@@ -25,8 +25,9 @@ const RoomSection = sequelize.define("RoomSection", {
   },
 });
 
-RoomSection.belongsTo(Teacher, {
-  foreignKey: "teacherId",
+RoomSection.belongsTo(User, {
+  foreignKey: "userId",
+  onDelete: "CASCADE",
 });
 
 module.exports = RoomSection;

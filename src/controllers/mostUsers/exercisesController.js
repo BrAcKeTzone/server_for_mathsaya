@@ -7,12 +7,12 @@ async function addExercise(req, res) {
       exerciseName,
       exerciseDescription,
       lessonId,
-      teacherId,
+      userId,
     } = req.body;
 
-    // Check if an Exercise with the same exerciseNumber and teacherId already exists
+    // Check if an Exercise with the same exerciseNumber and userId already exists
     const existingExercise = await Exercise.findOne({
-      where: { exerciseNumber, teacherId, lessonId },
+      where: { exerciseNumber, userId, lessonId },
     });
 
     if (existingExercise) {
@@ -26,7 +26,7 @@ async function addExercise(req, res) {
       exerciseName,
       exerciseDescription,
       lessonId,
-      teacherId,
+      userId,
     });
 
     res.status(201).json(newExercise);

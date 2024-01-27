@@ -22,7 +22,7 @@ const Question = sequelize.define("Question", {
     allowNull: true,
   },
   answer_choices: {
-    type: DataTypes.JSON,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   correct_answer: {

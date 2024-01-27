@@ -5,10 +5,10 @@ async function addYunit(req, res) {
   try {
     console.log("req.file:", req.file);
 
-    const { yunitNumber, yunitName, teacherId } = req.body;
+    const { yunitNumber, yunitName, userId } = req.body;
 
     const existingYunit = await Yunit.findOne({
-      where: { yunitNumber, teacherId },
+      where: { yunitNumber, userId },
     });
 
     if (existingYunit) {
@@ -20,7 +20,7 @@ async function addYunit(req, res) {
     const newYunitData = {
       yunitNumber,
       yunitName,
-      teacherId,
+      userId,
     };
 
     if (req.file) {
@@ -113,10 +113,10 @@ async function deleteYunit(req, res) {
 
 async function getYunitsByTeacher(req, res) {
   try {
-    const { teacherId } = req.params;
+    const { userId } = req.params;
 
     const yunits = await Yunit.findAll({
-      where: { teacherId },
+      where: { userId },
       order: [["yunitNumber", "ASC"]],
     });
 

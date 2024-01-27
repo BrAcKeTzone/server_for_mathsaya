@@ -5,11 +5,11 @@ async function addLesson(req, res) {
   try {
     console.log("req.file:", req.file);
 
-    const { lessonNumber, lessonName, lessonDescription, yunitId, teacherId } =
+    const { lessonNumber, lessonName, lessonDescription, yunitId, userId } =
       req.body;
 
     const existingLesson = await Lesson.findOne({
-      where: { lessonNumber, yunitId, teacherId },
+      where: { lessonNumber, yunitId, userId },
     });
 
     if (existingLesson) {
@@ -23,7 +23,7 @@ async function addLesson(req, res) {
       lessonName,
       lessonDescription,
       yunitId,
-      teacherId,
+      userId,
     };
 
     if (req.file) {

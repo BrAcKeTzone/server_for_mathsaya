@@ -41,8 +41,8 @@ const Lesson = sequelize.define("Lesson", {
     type: DataTypes.UUID,
     allowNull: false,
   },
-  teacherId: {
-    type: DataTypes.INTEGER,
+  userId: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
 });

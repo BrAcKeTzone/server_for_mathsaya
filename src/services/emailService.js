@@ -13,8 +13,26 @@ const sendOTPEmail = async (email, otp) => {
   const mailOptions = {
     from: process.env.MAIL_USER,
     to: email,
-    subject: "MathSaya Teacher Signup: Your One-Time Passcode (OTP)",
-    text: `Dear Teacher,\n\nThank you for choosing MathSaya! Your One-Time Passcode (OTP) for teacher signup is: ${otp}\n\nThis OTP is only valid for 5 minutes, so please use it promptly to complete your registration.\n\nIf you have any questions or need assistance, feel free to contact our support team.\n\nBest regards,\nThe MathSaya Team`,
+    subject: "MathSaya Service: Your One-Time Passcode (OTP)",
+    html: `
+    <html>
+      <body style="font-family: Arial, sans-serif; padding: 20px;">
+
+        <h2>Welcome to MathSaya, Teacher!</h2>
+
+        <p>Thank you for choosing MathSaya! Your One-Time Passcode (OTP) is:</p>
+
+        <h3 style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">${otp}</h3>
+
+        <p>This OTP is only valid for 5 minutes, so please use it promptly to complete your action.</p>
+
+        <p>If you have any questions or need assistance, feel free to contact our support team.</p>
+
+        <p>Best regards,<br/>The MathSaya Team</p>
+
+      </body>
+    </html>
+  `,
   };
 
   try {

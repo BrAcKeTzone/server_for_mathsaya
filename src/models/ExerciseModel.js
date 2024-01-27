@@ -25,8 +25,8 @@ const Exercise = sequelize.define("Exercise", {
     type: DataTypes.UUID,
     allowNull: false,
   },
-  teacherId: {
-    type: DataTypes.INTEGER,
+  userId: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
 });

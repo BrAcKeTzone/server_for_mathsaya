@@ -20,8 +20,8 @@ const Sprofile = sequelize.define("Sprofile", {
     type: DataTypes.UUID,
     allowNull: false,
   },
-  teacherId: {
-    type: DataTypes.UUID,
+  userId: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
 });

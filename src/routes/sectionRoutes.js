@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const sectionsController = require("../controllers/teacher/sectionsController");
+const sectionsController = require("../controllers/mostUsers/sectionsController");
 
 router.post("/add", sectionsController.addSection);
 
@@ -8,6 +8,6 @@ router.get("/view/:sectionId", sectionsController.viewSection);
 
 router.delete("/delete/:sectionId", sectionsController.deleteSection);
 
-router.get("/list/:teacherId", sectionsController.getSectionsByTeacher);
+router.get("/:userId", sectionsController.getSectionsByTeacher);
 
 module.exports = router;
