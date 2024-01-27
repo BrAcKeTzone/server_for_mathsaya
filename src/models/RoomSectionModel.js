@@ -1,10 +1,12 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 const User = require("./UserModel");
+const { v4: uuidv4 } = require("uuid");
 
 const RoomSection = sequelize.define("RoomSection", {
   sectionId: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
+    defaultValue: () => uuidv4(),
     primaryKey: true,
   },
   sectionName: {

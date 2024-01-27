@@ -4,8 +4,6 @@ async function addSection(req, res) {
   try {
     const { sectionName, schoolYear, userId } = req.body;
 
-    const sectionId = `${schoolYear} ${sectionName}`;
-
     const newRoomSection = await RoomSection.create({
       sectionId,
       sectionName,
