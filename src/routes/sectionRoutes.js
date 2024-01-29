@@ -6,7 +6,7 @@ router.post("/add", sectionsController.addSection);
 
 router.get("/view/:sectionId", sectionsController.viewSection);
 
-router.get("/edit/:sectionId", sectionsController.editSection);
+router.put("/edit/:sectionId", sectionsController.editSection);
 
 router.delete("/delete/:sectionId", sectionsController.deleteSection);
 

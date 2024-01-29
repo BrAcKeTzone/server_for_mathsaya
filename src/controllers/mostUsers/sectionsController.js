@@ -38,28 +38,21 @@ async function viewSection(req, res) {
 async function editSection(req, res) {
   try {
     const { sectionId } = req.params;
-    const { sectionName, schoolYear, userId } = req.body;
+    const updatedData = req.body;
 
-    const updatedRoomSection = await RoomSection.update(
-      {
-        sectionName,
-        schoolYear,
-        userId,
-      },
-      {
-        where: { sectionId },
-        returning: true,
-      }
-    );
+    const section = await RoomSection.findByPk(sectionId);
 
-    if (updatedRoomSection[0] === 0) {
-      res.status(404).json({ error: "Room section not found" });
-    } else {
-      res.json(updatedRoomSection[1][0]); // Return the updated room section
+    if (!section) {
+      res.status(404).json({ error: "Section not found" });
+      return;
     }
+
+    await section.update(updatedData);
+
+    res.json(section);
   } catch (error) {
-    console.error("Error during room section edit:", error);
-    res.status(500).json({ error: "Room section edit failed" });
+    console.error("Error during section edit:", error);
+    res.status(500).json({ error: "Section edit failed" });
   }
 }
 
