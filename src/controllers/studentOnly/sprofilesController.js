@@ -10,6 +10,7 @@ const CompletedUnit = require("../../models/CompletedUnitModel");
 
 async function login(req, res) {
   const { firstname, lastname, username } = req.body;
+
   try {
     const student = await Student.findOne({
       where: { firstname, lastname, username },
@@ -24,38 +25,47 @@ async function login(req, res) {
     });
 
     const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
 
     if (!studentProfile) {
       studentProfile = await Sprofile.create({
         studentId: student.studentId,
         profileId: student.profileId,
         firstLoginDate: currentDate,
+        loginDates: formattedDate,
         userId: student.userId,
-        loginDates: [currentDate],
       });
 
       return res.json({
         message: "First login, profile created",
         profile: studentProfile,
       });
-    } else if (!studentProfile.firstLoginDate) {
-      await studentProfile.update({
-        firstLoginDate: currentDate,
-        loginDates: [currentDate],
-      });
-
-      return res.json({
-        message: "Returning student, firstLoginDate updated",
-        profile: studentProfile,
-      });
     } else {
-      await studentProfile.update({
-        loginDates: [...studentProfile.loginDates, currentDate],
-      });
-      return res.json({
-        message: "Returning student, firstLoginDate is already set",
-        profile: studentProfile,
-      });
+      // Check if the formatted date is already present in loginDates
+      if (
+        !studentProfile.loginDates ||
+        !studentProfile.loginDates.includes(formattedDate)
+      ) {
+        // Append the current login date to the existing loginDates string
+        const updatedLoginDates = studentProfile.loginDates
+          ? studentProfile.loginDates + "," + formattedDate
+          : formattedDate;
+
+        await studentProfile.update({
+          firstLoginDate: studentProfile.firstLoginDate || currentDate,
+          loginDates: updatedLoginDates,
+        });
+
+        return res.json({
+          message: "Returning student, loginDates updated",
+          profile: studentProfile,
+        });
+      } else {
+        return res.json({
+          message: "Returning student, login date already exists",
+          profile: studentProfile,
+        });
+      }
     }
   } catch (error) {
     console.error(error);

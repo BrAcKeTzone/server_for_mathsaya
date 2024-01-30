@@ -13,8 +13,8 @@ const Sprofile = sequelize.define("Sprofile", {
     allowNull: false,
   },
   loginDates: {
-    type: DataTypes.JSON,
-    defaultValue: [],
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   studentId: {
     type: DataTypes.UUID,
