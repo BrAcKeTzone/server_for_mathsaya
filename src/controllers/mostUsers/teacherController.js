@@ -17,7 +17,7 @@ require("dotenv").config();
 async function getTeacherInfo(req, res) {
   try {
     const { userId } = req.params;
-    if (!(await checkTeacherPermission(userId, res))) {
+    if (!(await checkUserPermission(userId, res))) {
       return;
     }
     const teacher = await User.findByPk(userId);
