@@ -5,6 +5,9 @@ const cloudinary = require("../../config/cloudinaryConfig");
 const {
   checkAdminPermission,
 } = require("../../middlewares/checkAdminPermission");
+const {
+  checkUserPermission,
+} = require("../../middlewares/checkUserPermission");
 require("dotenv").config();
 
 async function getTeachers(req, res) {
@@ -66,7 +69,7 @@ async function getAdmins(req, res) {
 async function inboxUnreadEntries(req, res) {
   try {
     const { userId } = req.params;
-    if (!(await checkAdminPermission(userId, res))) {
+    if (!(await checkUserPermission(userId, res))) {
       return;
     }
     const inboxUnreadEntries = await EmailToAdmin.findAll({
@@ -85,7 +88,7 @@ async function inboxUnreadEntries(req, res) {
 async function inboxReadEntries(req, res) {
   try {
     const { userId } = req.params;
-    if (!(await checkAdminPermission(userId, res))) {
+    if (!(await checkUserPermission(userId, res))) {
       return;
     }
     const inboxReadEntries = await EmailToAdmin.findAll({
@@ -104,7 +107,7 @@ async function inboxReadEntries(req, res) {
 async function inboxAllEntries(req, res) {
   try {
     const { userId } = req.params;
-    if (!(await checkAdminPermission(userId, res))) {
+    if (!(await checkUserPermission(userId, res))) {
       return;
     }
     const inboxAllEntries = await EmailToAdmin.findAll({
@@ -273,22 +276,11 @@ async function deleteTeacher(req, res) {
 async function editTeacherInfo(req, res) {
   // can't edit email and password
   try {
-    const { userId, currentPassword, ...updatedData } = req.body;
+    const { userId } = req.params;
+    const { ...updatedData } = req.body;
     const teacher = await User.findByPk(userId);
     if (!teacher) {
       return res.status(404).json({ error: "User not found" });
-    }
-    if (currentPassword) {
-      const passwordMatch = await bcrypt.compare(
-        currentPassword,
-        teacher.password
-      );
-      if (!passwordMatch) {
-        return res.status(401).json({ error: "Incorrect current password" });
-      }
-    }
-    if (updatedData.password) {
-      updatedData.password = await bcrypt.hash(updatedData.password, 10);
     }
     await teacher.update(updatedData);
     res.json(teacher);

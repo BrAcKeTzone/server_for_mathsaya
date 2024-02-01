@@ -21,7 +21,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 router.post(
-  "/send",
+  "/send/:userId",
   upload.single("attachment"),
   teacherController.messageToAdmin
 );
@@ -40,7 +40,10 @@ router.get("/inbox/all/:userId", sAdminController.inboxAllEntries);
 
 router.get("/inbox/view/:emailId/:userId", sAdminController.viewInboxEntry);
 
-router.get("/inbox/delete/:emailId/:userId", sAdminController.deleteInboxEntry);
+router.delete(
+  "/inbox/delete/:emailId/:userId",
+  sAdminController.deleteInboxEntry
+);
 
 router.get("/admin/:userId", sAdminController.getAdminInfo);
 
@@ -52,7 +55,7 @@ router.get("/teacher/:userId", teacherController.getTeacherInfo);
 
 router.put("/teacher/edit", teacherController.editTeacherInfo);
 
-router.put("/bypass/teacher/edit", sAdminController.editTeacherInfo);
+router.put("/bypass/teacher/edit/:userId", sAdminController.editTeacherInfo);
 
 router.delete("/teacher/delete/:userId", sAdminController.deleteTeacher);
 

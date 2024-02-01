@@ -65,18 +65,17 @@ async function editTeacherInfo(req, res) {
 
 async function messageToAdmin(req, res) {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params;
     if (!(await checkUserPermission(userId, res))) {
       return;
     }
     console.log("req.file:", req.file);
-    const { teacherId, subject, content, attachment } = req.body;
-    const teacher = await User.findByPk(teacherId);
+    const { subject, content, attachment } = req.body;
+    const teacher = await User.findByPk(userId);
     if (!teacher) {
       return res.status(404).json({ error: "User not found" });
     }
     const newEmailData = {
-      teacherId,
       teacherEmail: teacher.email,
       subject,
       content,
