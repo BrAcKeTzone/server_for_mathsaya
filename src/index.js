@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const sequelize = require("./config/sequelize");
 
@@ -14,40 +13,35 @@ const lessonsRouter = require("./routes/lessonRoutes");
 const exercisesRouter = require("./routes/exerciseRoutes");
 const questionsRouter = require("./routes/questionRoutes");
 
-// Load environment variables from a .env file
-dotenv.config();
+// Load environment variables
+require("dotenv").config();
 
-// Create an Express application
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Set up CORS options
-// const corsOptions = {
-//   origin: [
-//     "https://mathsaya4kids.vercel.app",
-//     "https://mathsaya4kids.netlify.app",
-//   ],
-//   methods: "GET,PUT,POST,DELETE",
-//   credentials: true,
-//   optionsSuccessStatus: 204,
-// };
+// CORS configuration
+const corsOptions = {
+  origin: ["https://example.com"], // Whitelist your frontend URLs
+  methods: "GET,PUT,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-// Enable CORS with specified options
-// app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Handle preflight requests
-// app.options("*", (req, res) => {
-//   console.log("Handling preflight request");
-//   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-//   res.header("Access-Control-Allow-Headers", "Content-Type");
-//   res.header("Access-Control-Allow-Credentials", "true");
-//   res.status(200).send();
-// });
+app.options("*", cors(corsOptions));
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Body parser middleware
 app.use(bodyParser.json());
 
-// Set up routes for various API endpoints
+// Routes
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/sections", sectionsRouter);
@@ -58,7 +52,13 @@ app.use("/lessons", lessonsRouter);
 app.use("/exercises", exercisesRouter);
 app.use("/questions", questionsRouter);
 
-// Start the Express server
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
+
+// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sequelize
