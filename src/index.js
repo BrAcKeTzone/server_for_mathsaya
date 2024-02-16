@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 3001;
 
 // CORS configuration
 const corsOptions = {
-  origin: ["https://mathsaya4kids.vercel.app/"], // Whitelist your frontend URLs
+  origin: [/https:\/\/mathsaya4kids\.vercel\.app($|\/.*)/], // Regex to match the origin and any subpaths
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
