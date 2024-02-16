@@ -26,10 +26,6 @@ const Student = sequelize.define("Student", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  sectionId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   userId: {
     type: DataTypes.STRING,
     allowNull: false,

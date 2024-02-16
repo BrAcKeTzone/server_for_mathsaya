@@ -17,10 +17,6 @@ const RoomSection = sequelize.define("RoomSection", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  userId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   totalStudents: {
     type: DataTypes.INTEGER,
     allowNull: false,

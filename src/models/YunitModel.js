@@ -25,10 +25,6 @@ const Yunit = sequelize.define("Yunit", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  userId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 });
 
 Yunit.belongsTo(User, {
