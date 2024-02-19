@@ -1,4 +1,6 @@
 const bcrypt = require("bcryptjs");
+const { Op } = require("sequelize");
+
 const User = require("../../models/UserModel");
 const EmailToAdmin = require("../../models/EmailToAdminModel");
 const cloudinary = require("../../config/cloudinaryConfig");
@@ -16,22 +18,57 @@ async function getTeachers(req, res) {
     if (!(await checkAdminPermission(userId, res))) {
       return;
     }
-    const teachers = await User.findAll({
-      attributes: [
-        "UserId",
-        "firstname",
-        "lastname",
-        "email",
-        "gender",
-        "schoolName",
-      ],
-      where: { roleType: "Teacher" },
-      order: [["lastname", "ASC"]],
+
+    const { searchTerm } = req.query;
+
+    let teachers;
+    if (searchTerm) {
+      teachers = await User.findAll({
+        attributes: [
+          "UserId",
+          "firstname",
+          "lastname",
+          "email",
+          "gender",
+          "schoolName",
+        ],
+        where: {
+          roleType: "Teacher",
+          [Op.or]: [
+            { firstname: { [Op.like]: `%${searchTerm}%` } },
+            { lastname: { [Op.like]: `%${searchTerm}%` } },
+            { gender: { [Op.like]: `%${searchTerm}%` } },
+          ],
+        },
+        order: [["lastname", "ASC"]],
+      });
+    } else {
+      // Pagination parameters
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10; // Default page size is 10
+
+      const offset = (page - 1) * pageSize;
+
+      teachers = await User.findAndCountAll({
+        attributes: [
+          "UserId",
+          "firstname",
+          "lastname",
+          "email",
+          "gender",
+          "schoolName",
+        ],
+        where: { roleType: "Teacher" },
+        order: [["lastname", "ASC"]],
+        offset,
+        limit: pageSize,
+      });
+    }
+
+    res.json({
+      totalCount: teachers.length,
+      teachers,
     });
-    const teacherCount = await User.count({
-      where: { roleType: "Teacher" },
-    });
-    res.json({ teacherCount, teachers });
   } catch (error) {
     console.error("Error during fetching list of teachers:", error);
     res.status(500).json({ error: "Fetching teachers list failed" });
@@ -44,25 +81,60 @@ async function getAdmins(req, res) {
     if (!(await checkAdminPermission(userId, res))) {
       return;
     }
-    const admin = await User.findAll({
-      attributes: [
-        "UserId",
-        "firstname",
-        "lastname",
-        "email",
-        "gender",
-        "schoolName",
-      ],
-      where: { roleType: "Admin" },
-      order: [["lastname", "ASC"]],
+
+    const { searchTerm } = req.query;
+
+    let admins;
+    if (searchTerm) {
+      admins = await User.findAll({
+        attributes: [
+          "UserId",
+          "firstname",
+          "lastname",
+          "email",
+          "gender",
+          "schoolName",
+        ],
+        where: {
+          roleType: "Admin",
+          [Op.or]: [
+            { firstname: { [Op.like]: `%${searchTerm}%` } },
+            { lastname: { [Op.like]: `%${searchTerm}%` } },
+            { gender: { [Op.like]: `%${searchTerm}%` } },
+          ],
+        },
+        order: [["lastname", "ASC"]],
+      });
+    } else {
+      // Pagination parameters
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10; // Default page size is 10
+
+      const offset = (page - 1) * pageSize;
+
+      admins = await User.findAndCountAll({
+        attributes: [
+          "UserId",
+          "firstname",
+          "lastname",
+          "email",
+          "gender",
+          "schoolName",
+        ],
+        where: { roleType: "Admin" },
+        order: [["lastname", "ASC"]],
+        offset,
+        limit: pageSize,
+      });
+    }
+
+    res.json({
+      totalCount: admins.length,
+      admins,
     });
-    const adminCount = await User.count({
-      where: { roleType: "Admin" },
-    });
-    res.json({ adminCount, admin });
   } catch (error) {
-    console.error("Error during fetching list of admin:", error);
-    res.status(500).json({ error: "Fetching admin list failed" });
+    console.error("Error during fetching list of admins:", error);
+    res.status(500).json({ error: "Fetching admins list failed" });
   }
 }
 
