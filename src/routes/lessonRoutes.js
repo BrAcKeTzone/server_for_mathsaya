@@ -17,7 +17,7 @@ const storage = new CloudinaryStorage({
       return `lesson_${Date.now()}_${file.originalname}`;
     },
   },
-  allowedFormats: ["jpg", "jpeg", "png", "mp4"],
+  allowedFormats: ["jpg", "jpeg", "png", "mp4", "gif"],
   timeout: 60000 * 5,
 });
 const upload = multer({ storage: storage });
