@@ -6,13 +6,19 @@ async function addQuestion(req, res) {
   try {
     console.log("req.file:", req.file);
 
-    const { question_text, answer_choices, correct_answer, exerciseId } =
-      req.body;
+    const {
+      question_text,
+      answer_choices,
+      correct_answer,
+      answer_explanation,
+      exerciseId,
+    } = req.body;
 
     const newQuestionData = {
       question_text,
       answer_choices,
       correct_answer,
+      answer_explanation,
       exerciseId,
     };
 
