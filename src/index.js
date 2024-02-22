@@ -32,6 +32,10 @@ app.use(cors(corsOptions));
 // Handle preflight requests
 app.options("*", cors(corsOptions));
 
+// app.use(cors());
+
+// app.options("*", cors());
+
 // Logging middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
