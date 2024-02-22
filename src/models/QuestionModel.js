@@ -33,6 +33,10 @@ const Question = sequelize.define("Question", {
     type: DataTypes.UUID,
     allowNull: false,
   },
+  answer_explanation: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 });
 
 Question.belongsTo(Exercise, {
