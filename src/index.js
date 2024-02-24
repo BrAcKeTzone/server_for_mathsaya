@@ -24,6 +24,7 @@ const corsOptions = {
   origin: [
     /https:\/\/mathsaya4kids\.vercel\.app($|\/.*)/,
     /https:\/\/mathsaya4kids\.onrender\.com($|\/.*)/,
+    /https:\/\/www\.mathsaya4kids\.site($|\/.*)/,
   ],
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
