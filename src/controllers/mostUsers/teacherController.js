@@ -5,6 +5,7 @@ const Student = require("../../models/StudentModel");
 const Yunit = require("../../models/YunitModel");
 const Lesson = require("../../models/LessonModel");
 const Exercise = require("../../models/ExerciseModel");
+const Sprofile = require("../../models/SprofileModel");
 const {
   checkUserPermission,
 } = require("../../middlewares/checkUserPermission");
@@ -111,12 +112,21 @@ async function getDashboardStats(req, res) {
     const totalExercises = await Exercise.count({
       where: { userId },
     });
+    const studentProfiles = await Sprofile.findAll({
+      attributes: ["studentId", "firstLoginDate", "loginDates"],
+      include: {
+        model: Student,
+        attributes: ["firstname", "lastname"],
+        where: { userId },
+      },
+    });
     const dashboardStats = {
       totalSections,
       totalStudents,
       totalYunits,
       totalLessons,
       totalExercises,
+      studentProfiles,
     };
 
     res.json(dashboardStats);
