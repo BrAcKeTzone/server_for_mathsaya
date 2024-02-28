@@ -278,7 +278,7 @@ async function addCompletedLesson(req, res) {
       },
     });
 
-    const totalStarRating = await CompletedExercise.sum("starRating", {
+    const totalStarRating = await CompletedExercise.count({
       where: {
         studentProfileId,
       },
@@ -290,13 +290,27 @@ async function addCompletedLesson(req, res) {
       },
     });
 
+    const totalRatingSum = await CompletedExercise.sum("starRating", {
+      where: {
+        studentProfileId,
+      },
+      include: {
+        model: Exercise,
+        where: {
+          lessonId,
+        },
+      },
+    });
+
+    const averageRating = totalRatingSum / totalStarRating;
+
     if (existingEntry) {
-      await existingEntry.update({ starRating: totalStarRating });
+      await existingEntry.update({ starRating: averageRating });
       return res.json(existingEntry);
     } else {
       const completedLesson = await CompletedLesson.create({
         lessonId,
-        starRating: totalStarRating,
+        starRating: averageRating,
         studentProfileId,
       });
       return res.json(completedLesson);
@@ -317,7 +331,7 @@ async function addCompletedYunit(req, res) {
       },
     });
 
-    const totalStarRating = await CompletedLesson.sum("starRating", {
+    const totalLessonCount = await CompletedLesson.count({
       where: {
         studentProfileId,
       },
@@ -329,13 +343,27 @@ async function addCompletedYunit(req, res) {
       },
     });
 
+    const totalRatingSum = await CompletedLesson.sum("starRating", {
+      where: {
+        studentProfileId,
+      },
+      include: {
+        model: Lesson,
+        where: {
+          yunitId,
+        },
+      },
+    });
+
+    const averageRating = totalRatingSum / totalLessonCount;
+
     if (existingEntry) {
-      await existingEntry.update({ starRating: totalStarRating });
+      await existingEntry.update({ starRating: averageRating });
       return res.json(existingEntry);
     } else {
       const completedUnit = await CompletedUnit.create({
         yunitId,
-        starRating: totalStarRating,
+        starRating: averageRating,
         studentProfileId,
       });
       return res.json(completedUnit);
